@@ -1,0 +1,67 @@
+{
+  "documents": [
+    {
+      "name": "12-amazing-animal-facts",
+      "path": "documents/animal facts/12-amazing-animal-facts.md",
+      "type": "document",
+      "lastModified": "2025-09-02T05:31:45.501Z",
+      "description": "",
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "emoji": "🦁"
+    },
+    {
+      "name": "Karthik2",
+      "path": "documents/Test folder/Karthik2.md",
+      "type": "document",
+      "lastModified": "2025-09-02T05:31:45.502Z",
+      "description": "",
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "emoji": "⛺️"
+    },
+    {
+      "name": "Hexhunt Rules",
+      "path": "documents/Hexhunt Rules.md",
+      "type": "document",
+      "lastModified": "2025-09-02T05:31:45.502Z",
+      "description": "",
+      "referencedIn": [
+        "documents/Trial Document.md"
+      ],
+      "containsReferencesTo": [],
+      "emoji": "🎟️"
+    },
+    {
+      "name": "Trial Document",
+      "path": "documents/Trial Document.md",
+      "type": "document",
+      "lastModified": "2025-09-02T05:31:45.502Z",
+      "description": "",
+      "referencedIn": [],
+      "containsReferencesTo": [
+        "documents/Hexhunt Rules.md"
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "name": "animal facts",
+      "path": "documents/animal facts",
+      "type": "folder",
+      "description": "",
+      "documentCount": 1,
+      "referencedIn": [],
+      "containsReferencesTo": []
+    },
+    {
+      "name": "Test folder",
+      "path": "documents/Test folder",
+      "type": "folder",
+      "description": "a test folder",
+      "documentCount": 1,
+      "referencedIn": [],
+      "containsReferencesTo": []
+    }
+  ]
+}
