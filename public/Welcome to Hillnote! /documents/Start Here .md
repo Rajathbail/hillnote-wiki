@@ -1,4 +1,4 @@
-# **==Welcome to Hillnote! 👋🏽==**
+# **==Hello! 👋🏽==**
 
 Welcome to Hillnote! We’re so excited to have you here and thank you for giving it a try. 🎉
 
