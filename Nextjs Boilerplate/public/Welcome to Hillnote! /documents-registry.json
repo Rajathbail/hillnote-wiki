@@ -1,227 +1,73 @@
 {
   "documents": [
     {
-      "name": "Connect with ChatGPT",
-      "path": "documents/Connect/Connect with ChatGPT.md",
+      "name": "And an empty file",
+      "path": "documents/Folder/And an empty file.md",
       "type": "document",
-      "lastModified": "2025-09-03T13:00:27.771Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "🎈"
-    },
-    {
-      "name": "Connect with Claude ",
-      "path": "documents/Connect/Connect with Claude .md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.771Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "💥"
-    },
-    {
-      "name": "Connect with Deepseek",
-      "path": "documents/Connect/Connect with Deepseek.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.771Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "🐋"
-    },
-    {
-      "name": "Connect with Gemini",
-      "path": "documents/Connect/Connect with Gemini.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.771Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "🥶"
-    },
-    {
-      "name": "Connect with Grok",
-      "path": "documents/Connect/Connect with Grok.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.771Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "🎮"
-    },
-    {
-      "name": "Connect with Perplexity",
-      "path": "documents/Connect/Connect with Perplexity.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.771Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "🤺"
-    },
-    {
-      "name": "Pair with Cursor",
-      "path": "documents/Pair with/Pair with Cursor.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.773Z",
+      "lastModified": "2025-09-03T17:26:02.201Z",
       "description": "",
       "referencedIn": [],
       "containsReferencesTo": [],
-      "emoji": "📮"
+      "emoji": "🎺"
     },
     {
-      "name": "Pair with Github CoPilot",
-      "path": "documents/Pair with/Pair with Github CoPilot.md",
+      "name": "Capabilities",
+      "path": "documents/Capabilities.md",
       "type": "document",
-      "lastModified": "2025-09-03T13:00:27.773Z",
-      "description": "",
-      "referencedIn": [],
-      "containsReferencesTo": [],
-      "emoji": "🏀"
-    },
-    {
-      "name": "GDrive",
-      "path": "documents/Sync & Collaborate/GDrive.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
-      "description": "",
-      "referencedIn": [],
-      "containsReferencesTo": [],
-      "emoji": "🧃"
-    },
-    {
-      "name": "Github",
-      "path": "documents/Sync & Collaborate/Github.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
-      "description": "",
-      "referencedIn": [],
-      "containsReferencesTo": [],
-      "emoji": "🗿"
-    },
-    {
-      "name": "About the Editor",
-      "path": "documents/About the Editor.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
+      "lastModified": "2025-09-03T17:26:02.201Z",
       "description": "",
       "referencedIn": [
-        "documents/Start Here .md"
+        "documents/Start here! .md"
       ],
-      "containsReferencesTo": [
-        "documents/Start Here .md"
+      "containsReferencesTo": [],
+      "emoji": "🦈"
+    },
+    {
+      "name": "Editing these files",
+      "path": "documents/Editing these files.md",
+      "type": "document",
+      "lastModified": "2025-09-03T17:26:02.201Z",
+      "description": "",
+      "referencedIn": [
+        "documents/Start here! .md"
       ],
+      "containsReferencesTo": [],
       "emoji": "🥨"
     },
     {
-      "name": "AI in Hillnote",
-      "path": "documents/AI in Hillnote.md",
+      "name": "Setting up the NPM",
+      "path": "documents/Setting up the NPM.md",
       "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
+      "lastModified": "2025-09-03T17:26:02.201Z",
       "description": "",
       "referencedIn": [
-        "documents/Start Here .md"
+        "documents/Start here! .md"
       ],
       "containsReferencesTo": [],
-      "emoji": "🥁"
+      "emoji": "🛹"
     },
     {
-      "name": "Connecting to Hillnote",
-      "path": "documents/Connecting to Hillnote.md",
+      "name": "Start here! ",
+      "path": "documents/Start here! .md",
       "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "🗻"
-    },
-    {
-      "name": "Get in touch",
-      "path": "documents/Get in touch.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
+      "lastModified": "2025-09-03T17:26:02.201Z",
       "description": "",
       "referencedIn": [],
-      "containsReferencesTo": [],
-      "emoji": "🪕"
-    },
-    {
-      "name": "Make it yours",
-      "path": "documents/Make it yours.md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
-      "description": "",
-      "referencedIn": [
-        "documents/Start Here .md"
-      ],
-      "containsReferencesTo": [],
-      "emoji": "🍊"
-    },
-    {
-      "name": "Start Here ",
-      "path": "documents/Start Here .md",
-      "type": "document",
-      "lastModified": "2025-09-03T13:00:27.774Z",
-      "description": "",
-      "referencedIn": [
-        "documents/About the Editor.md"
-      ],
       "containsReferencesTo": [
-        "documents/About the Editor.md",
-        "documents/AI in Hillnote.md",
-        "documents/Connecting to Hillnote.md",
-        "documents/Make it yours.md",
-        "documents/Connect/Connect with ChatGPT.md",
-        "documents/Connect/Connect with Claude .md",
-        "documents/Connect/Connect with Gemini.md",
-        "documents/Connect/Connect with Grok.md",
-        "documents/Connect/Connect with Perplexity.md",
-        "documents/Connect/Connect with Deepseek.md",
-        "documents/Sync/GDrive.md",
-        "documents/Sync/Github.md"
-      ]
+        "documents/Editing these files.md",
+        "documents/Capabilities.md",
+        "documents/Setting up the NPM.md"
+      ],
+      "emoji": "🌵"
     }
   ],
   "folders": [
     {
-      "name": "Connect",
-      "path": "documents/Connect",
+      "name": "Folder",
+      "path": "documents/Folder",
       "type": "folder",
       "description": "",
-      "documentCount": 6,
-      "referencedIn": [],
-      "containsReferencesTo": []
-    },
-    {
-      "name": "Pair with",
-      "path": "documents/Pair with",
-      "type": "folder",
-      "description": "",
-      "documentCount": 2,
-      "referencedIn": [],
-      "containsReferencesTo": []
-    },
-    {
-      "name": "Sync & Collaborate",
-      "path": "documents/Sync & Collaborate",
-      "type": "folder",
-      "description": "",
-      "documentCount": 2,
+      "documentCount": 1,
       "referencedIn": [],
       "containsReferencesTo": []
     }

@@ -8,8 +8,8 @@
 4. **Use the context below** to understand my current priorities when helping
 ---
 
-**Purpose:** Test workspace
-**Documents:** 16 files | **Last Updated:** 2025-09-03
+**Purpose:** A quick workspace to demonstrate the wiki conversion of the Hillnote-wiki NPM
+**Documents:** 5 files | **Last Updated:** 2025-09-03
 
 ## Directory Structure
 - **documents/**: All your markdown documents and notes
