@@ -8,8 +8,15 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { siteConfig } from "@/config/site.config"
 
 export default function Home() {
-  const { ui } = siteConfig
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
+  
+  // UI Settings - using Tailwind classes instead of config
+  const showTitleBar = true
+  const showNavigation = true
+  const showTableOfContents = true
+  const showSiteName = true
+  const showThemeToggle = true
+  const enableThemeToggle = true
 
   // Set initial file on mount
   useEffect(() => {
@@ -20,61 +27,55 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Header - Conditionally rendered based on config */}
-      {ui.titleBar.enabled && (
-        <header 
-          className="bg-background flex items-center justify-between px-8"
-          style={{ 
-            height: `${ui.titleBar.height}px`,
-            paddingTop: ui.titleBar.height === 48 ? '32px' : '16px',
-            paddingBottom: '16px'
-          }}
-        >
-          {ui.titleBar.showSiteName && (
+      {/* Header */}
+      {showTitleBar && (
+        <header className="h-16 bg-background flex items-center justify-between px-8 pt-8 pb-4">
+          {showSiteName && (
             <div className="flex items-center gap-2">
               <span className="font-semibold text-lg">{siteConfig.siteName}</span>
             </div>
           )}
-          {ui.titleBar.showThemeToggle && ui.theme.enableThemeToggle && (
+          {showThemeToggle && enableThemeToggle && (
             <ThemeToggle />
           )}
         </header>
       )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar - Navigation (Conditionally rendered) */}
-        {ui.navigationSidebar.enabled && (
-          <aside 
-            className="flex-shrink-0"
-            style={{ width: `${ui.navigationSidebar.width}px` }}
-          >
-            <NavigationSidebar 
-              showTitle={ui.navigationSidebar.showTitle}
-              title={ui.navigationSidebar.title}
-              onFileSelect={setSelectedFile}
-              selectedFile={selectedFile}
-            />
-          </aside>
-        )}
+      {/* Main Content Area - Using Simple Grid System */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full grid grid-cols-5 gap-0 max-w-8xl mx-auto">
+          
+          {/* Left Sidebar - Navigation */}
+          {showNavigation && (
+            <aside className="col-span-1 border-r border-border border-dashed overflow-y-auto">
+              <NavigationSidebar 
+                showTitle={true}
+                title="All Pages"
+                onFileSelect={setSelectedFile}
+                selectedFile={selectedFile}
+              />
+            </aside>
+          )}
 
-        {/* Center - Main Content */}
-        <main className="flex-1 bg-background">
-          <MainContent selectedFile={selectedFile} onFileSelect={setSelectedFile} />
-        </main>
+          {/* Center - Main Content */}
+          <main className={`bg-background overflow-y-auto ${
+            showNavigation && showTableOfContents ? 'col-span-3' :
+            showNavigation || showTableOfContents ? 'col-span-3' : 
+            'col-span-12'
+          }`}>
+            <MainContent selectedFile={selectedFile} onFileSelect={setSelectedFile} />
+          </main>
 
-        {/* Right Sidebar - Table of Contents (Conditionally rendered) */}
-        {ui.tableOfContents.enabled && (
-          <aside 
-            className="flex-shrink-0"
-            style={{ width: `${ui.tableOfContents.width}px` }}
-          >
-            <TableOfContents 
-              showTitle={ui.tableOfContents.showTitle}
-              title={ui.tableOfContents.title}
-            />
-          </aside>
-        )}
+          {/* Right Sidebar - Table of Contents */}
+          {showTableOfContents && (
+            <aside className="col-span-1 overflow-y-auto">
+              <TableOfContents 
+                showTitle={true}
+                title="On This Page"
+              />
+            </aside>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -294,7 +294,7 @@ export function TableOfContents({
               "flex-1 text-left text-sm py-1 px-2 rounded-md transition-colors",
               depth === 0 ? "font-medium" : "",
               depth === 1 ? "text-muted-foreground" : "",
-              depth >= 2 ? "text-muted-foreground text-xs" : "",
+              depth >= 2 ? "text-muted-foreground" : "",
               isActive
                 ? "bg-accent text-accent-foreground font-medium"
                 : "hover:bg-accent/50",
@@ -335,7 +335,7 @@ export function TableOfContents({
 
   return (
     <div className="h-full p-3">
-      <div className="h-full flex flex-col bg-muted rounded-lg">
+      <div className="h-full flex flex-col">
         {showTitle && (
           <div className="px-6 pt-6 pb-4 flex-shrink-0">
             <h3 className="text-xs text-primary/40 font-semibold">{title}</h3>

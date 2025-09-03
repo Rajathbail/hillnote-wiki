@@ -35,64 +35,8 @@ export const siteConfig = {
     ],
   },
   
-  // UI Configuration
+  // UI Configuration - only keeping content-related settings
   ui: {
-    // Theme settings
-    theme: {
-      // Options: "light" | "dark" | "system"
-      defaultTheme: "system" as "light" | "dark" | "system",
-      // Allow users to toggle theme
-      enableThemeToggle: true,
-    },
-    
-    // Title bar settings
-    titleBar: {
-      // Show/hide the title bar
-      enabled: true,
-      // Title bar height in pixels
-      height: 48,
-      // Show site name in title bar
-      showSiteName: true,
-      // Show theme toggle in title bar
-      showThemeToggle: true,
-    },
-    
-    // Table of Contents settings
-    tableOfContents: {
-      // Show/hide the table of contents sidebar
-      enabled: true,
-      // Width of the TOC sidebar
-      width: 256,
-      // Show TOC title
-      showTitle: true,
-      // TOC title text
-      title: "On This Page",
-    },
-    
-    // Navigation sidebar settings
-    navigationSidebar: {
-      // Show/hide the navigation sidebar
-      enabled: true,
-      // Width of the navigation sidebar
-      width: 256,
-      // Show sidebar title
-      showTitle: true,
-      // Sidebar title text
-      title: "All Pages",
-    },
-    
-    // Layout settings
-    layout: {
-      // Maximum content width
-      maxContentWidth: "4xl",
-      // Content padding
-      contentPadding: 32,
-      // Show floating panels with margins
-      floatingPanels: true,
-      // Panel border style: "solid" | "dashed" | "none"
-      panelBorderStyle: "dashed" as "solid" | "dashed" | "none",
-    },
-    
     // Comments/Authors Notes section
     authorsNotes: {
       // Show/hide authors notes section at the bottom

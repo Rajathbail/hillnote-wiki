@@ -31,8 +31,8 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme={siteConfig.ui.theme.defaultTheme}
-          enableSystem={siteConfig.ui.theme.defaultTheme === "system"}
+          defaultTheme="system"
+          enableSystem={true}
           disableTransitionOnChange
         >
           {children}

@@ -151,9 +151,9 @@ export function NavigationSidebar({
 
   return (
     <div className="h-full p-3">
-      <div className="h-full flex flex-col overflow-hidden bg-muted rounded-lg">
+      <div className="h-full flex flex-col overflow-hidden">
         {showTitle && (
-          <div className="px-6 pt-6">
+          <div className="px-3 pt-6">
             <h3 className="text-xs text-primary/40 font-semibold">{title}</h3>
           </div>
         )}

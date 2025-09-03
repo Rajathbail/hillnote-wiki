@@ -8,8 +8,8 @@
 4. **Use the context below** to understand my current priorities when helping
 ---
 
-**Purpose:** A workspace that describes Hillnote for users new to the platform! The best place to learn more about the platform and its many features.
-**Documents:** 16 files | **Last Updated:** 2025-09-02
+**Purpose:** Test workspace
+**Documents:** 16 files | **Last Updated:** 2025-09-03
 
 ## Directory Structure
 - **documents/**: All your markdown documents and notes

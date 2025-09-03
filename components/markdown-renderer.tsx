@@ -2,10 +2,13 @@
 
 import React, { useEffect, useState, useRef } from 'react'
 import { marked } from 'marked'
+// @ts-ignore - marked-gfm-heading-id doesn't have type definitions
+import { gfmHeadingId } from 'marked-gfm-heading-id'
 import { Layers2, Loader2 } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DocumentFooter } from '@/components/document-footer'
 import { ScratchSpace } from '@/components/scratchspace'
+import { ResourcePDF, ResourceHTML, ResourceFile, ResourceYouTube } from '@/components/resource-tiles'
 import { siteConfig } from '@/config/site.config'
 import { createRoot } from 'react-dom/client'
 import '../styles/markdown.css'
@@ -13,27 +16,186 @@ import '../styles/markdown.css'
 // Configure marked options - matching HillnoteApp settings
 const renderer = new marked.Renderer()
 
+// Add custom marked extensions for PDF and HTML resources
+marked.use({
+  extensions: [
+    {
+      name: 'pdf',
+      level: 'inline',
+      start(src) { 
+        return src.indexOf('[pdf:')
+      },
+      tokenizer(src) {
+        const match = src.match(/^\[pdf:([^\]]+)\]\(([^)]+)\)/)
+        if (match) {
+          return {
+            type: 'pdf',
+            raw: match[0],
+            title: match[1],
+            href: match[2]
+          }
+        }
+      },
+      renderer(token) {
+        const pdfTitle = token.title || 'PDF Document'
+        const pdfSrc = token.href || ''
+        
+        if (!pdfSrc) return ''
+        
+        // Create a placeholder for React component
+        return `<div class="resource-pdf-placeholder" data-type="resource-pdf" data-src="${pdfSrc}" data-title="${pdfTitle.replace(/"/g, '&quot;')}"></div>`
+      }
+    },
+    {
+      name: 'htmlEmbed',
+      level: 'inline',
+      start(src) { 
+        return src.indexOf('[html:')
+      },
+      tokenizer(src) {
+        const match = src.match(/^\[html:([^\]]+)\]\(([^)]+)\)/)
+        if (match) {
+          return {
+            type: 'htmlEmbed',
+            raw: match[0],
+            title: match[1],
+            href: match[2]
+          }
+        }
+      },
+      renderer(token) {
+        const htmlTitle = token.title || 'HTML Document'
+        const htmlSrc = token.href || ''
+        
+        if (!htmlSrc) return ''
+        
+        // Create a placeholder for React component
+        return `<div class="resource-html-placeholder" data-type="resource-html" data-src="${htmlSrc}" data-title="${htmlTitle.replace(/"/g, '&quot;')}"></div>`
+      }
+    },
+    {
+      name: 'fileResource',
+      level: 'inline',
+      start(src) { 
+        return src.indexOf('[file:')
+      },
+      tokenizer(src) {
+        const match = src.match(/^\[file:([^\]]+)\]\(([^)]+)\)/)
+        if (match) {
+          return {
+            type: 'fileResource',
+            raw: match[0],
+            name: match[1],
+            path: match[2]
+          }
+        }
+      },
+      renderer(token) {
+        const fileName = token.name || 'File'
+        const filePath = token.path || ''
+        
+        if (!filePath) return ''
+        
+        // Create a placeholder for React component
+        return `<div class="resource-file-placeholder" data-type="resource-file" data-path="${filePath}" data-name="${fileName.replace(/"/g, '&quot;')}" data-file-type="file"></div>`
+      }
+    },
+    {
+      name: 'youtube',
+      level: 'inline',
+      start(src) { 
+        return src.indexOf('[youtube:')
+      },
+      tokenizer(src) {
+        const match = src.match(/^\[youtube:([^\]]+)\]\(([^)]+)\)/)
+        if (match) {
+          return {
+            type: 'youtube',
+            raw: match[0],
+            title: match[1],
+            videoId: match[2]
+          }
+        }
+      },
+      renderer(token) {
+        const videoTitle = token.title || 'YouTube Video'
+        const videoId = token.videoId || ''
+        
+        if (!videoId) return ''
+        
+        // Create a placeholder for React component
+        return `<div class="resource-youtube-placeholder" data-type="resource-youtube" data-video-id="${videoId}" data-title="${videoTitle.replace(/"/g, '&quot;')}"></div>`
+      }
+    },
+    {
+      name: 'folderResource',
+      level: 'inline',
+      start(src) { 
+        return src.indexOf('[folder:')
+      },
+      tokenizer(src) {
+        const match = src.match(/^\[folder:([^\]]+)\]\(([^)]+)\)/)
+        if (match) {
+          return {
+            type: 'folderResource',
+            raw: match[0],
+            name: match[1],
+            path: match[2]
+          }
+        }
+      },
+      renderer(token) {
+        const folderName = token.name || 'Folder'
+        const folderPath = token.path || ''
+        
+        if (!folderPath) return ''
+        
+        // Create a placeholder for React component
+        return `<div class="resource-file-placeholder" data-type="resource-file" data-path="${folderPath}" data-name="${folderName.replace(/"/g, '&quot;')}" data-file-type="folder"></div>`
+      }
+    }
+  ]
+})
+
 renderer.link = function(options: any) {
   const { href, title, text } = options
+  
+  // Simple inline markdown processing without recursion
+  let processedText = text || ''
+  
+  // Handle basic markdown formatting manually to avoid recursion
+  // Bold: **text** or __text__
+  processedText = processedText.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  processedText = processedText.replace(/__([^_]+)__/g, '<strong>$1</strong>')
+  
+  // Italic: *text* or _text_
+  processedText = processedText.replace(/\*([^*]+)\*/g, '<em>$1</em>')
+  processedText = processedText.replace(/_([^_]+)_/g, '<em>$1</em>')
+  
+  // Code: `text`
+  processedText = processedText.replace(/`([^`]+)`/g, '<code>$1</code>')
+  
   // Check if it's an internal document link (will be handled separately)
   if (!href || typeof href !== 'string') {
-    return `<a href="">${text || ''}</a>`
+    return `<a href="">${processedText}</a>`
   }
   if (href.startsWith('#') || href.startsWith('doc:')) {
-    return `<a href="${href}"${title ? ` title="${title}"` : ''}>${text || ''}</a>`
+    return `<a href="${href}"${title ? ` title="${title}"` : ''}>${processedText}</a>`
   }
   // All external links open in new tab
-  return `<a href="${href}" target="_blank" rel="noopener noreferrer"${title ? ` title="${title}"` : ''}>${text || ''}</a>`
+  return `<a href="${href}" target="_blank" rel="noopener noreferrer"${title ? ` title="${title}"` : ''}>${processedText}</a>`
 }
 
 marked.use({
   gfm: true,
   breaks: true,
   pedantic: false,
-  headerIds: true, // Enable header IDs for table of contents
-  headerPrefix: 'heading-', // Prefix for generated IDs
   renderer
 })
+
+marked.use(gfmHeadingId({
+  prefix: 'heading-'
+}))
 
 interface MarkdownRendererProps {
   filePath: string | null
@@ -118,6 +280,36 @@ const parseCustomMarkdown = (markdown: string) => {
       placeholder
     })
   }
+  
+  // Handle PDF syntax before other processing: [pdf:Title](path)
+  processedMarkdown = processedMarkdown.replace(/\[pdf:([^\]]+)\]\(([^)]+)\)/g, (match) => {
+    // Return as-is, let marked handle it with the custom extension
+    return match
+  })
+  
+  // Handle HTML syntax before other processing: [html:Title](path)
+  processedMarkdown = processedMarkdown.replace(/\[html:([^\]]+)\]\(([^)]+)\)/g, (match) => {
+    // Return as-is, let marked handle it with the custom extension
+    return match
+  })
+  
+  // Handle file syntax: [file:Name](path)
+  processedMarkdown = processedMarkdown.replace(/\[file:([^\]]+)\]\(([^)]+)\)/g, (match) => {
+    // Return as-is, let marked handle it with the custom extension
+    return match
+  })
+  
+  // Handle folder syntax: [folder:Name](path)
+  processedMarkdown = processedMarkdown.replace(/\[folder:([^\]]+)\]\(([^)]+)\)/g, (match) => {
+    // Return as-is, let marked handle it with the custom extension
+    return match
+  })
+  
+  // Handle YouTube syntax: [youtube:Title](videoId)
+  processedMarkdown = processedMarkdown.replace(/\[youtube:([^\]]+)\]\(([^)]+)\)/g, (match) => {
+    // Return as-is, let marked handle it with the custom extension
+    return match
+  })
   
   // Handle document links - convert [[title|doc:path]] to HTML
   processedMarkdown = processedMarkdown.replace(/\[\[([^\|]+)\|doc:([^\]]+)\]\]/g, (_match, title, href) => {
@@ -302,6 +494,7 @@ export function MarkdownRenderer({ filePath, onFileSelect }: MarkdownRendererPro
   const contentRef = useRef<HTMLDivElement>(null)
   const checkboxRootsRef = useRef<Array<any>>([])
   const scratchspaceRootsRef = useRef<Array<any>>([])
+  const resourceRootsRef = useRef<Array<any>>([])
 
   useEffect(() => {
     const loadMarkdown = async () => {
@@ -681,6 +874,15 @@ export function MarkdownRenderer({ filePath, onFileSelect }: MarkdownRendererPro
         }
       })
       scratchspaceRootsRef.current = []
+      
+      resourceRootsRef.current.forEach(root => {
+        try {
+          root.unmount()
+        } catch (e) {
+          // Ignore errors during cleanup
+        }
+      })
+      resourceRootsRef.current = []
 
       // Find all checkbox placeholders and replace with React components
       if (contentRef.current) {
@@ -720,6 +922,63 @@ export function MarkdownRenderer({ filePath, onFileSelect }: MarkdownRendererPro
             )
             scratchspaceRootsRef.current.push(root)
           }
+        })
+        
+        // Find all PDF resource placeholders and replace with React components
+        const pdfPlaceholders = contentRef.current.querySelectorAll('.resource-pdf-placeholder')
+        pdfPlaceholders.forEach(placeholder => {
+          const src = placeholder.getAttribute('data-src') || ''
+          const title = placeholder.getAttribute('data-title') || 'PDF Document'
+          
+          const container = document.createElement('div')
+          placeholder.replaceWith(container)
+          
+          const root = createRoot(container)
+          root.render(<ResourcePDF src={src} title={title} />)
+          resourceRootsRef.current.push(root)
+        })
+        
+        // Find all HTML resource placeholders and replace with React components
+        const htmlPlaceholders = contentRef.current.querySelectorAll('.resource-html-placeholder')
+        htmlPlaceholders.forEach(placeholder => {
+          const src = placeholder.getAttribute('data-src') || ''
+          const title = placeholder.getAttribute('data-title') || 'HTML Document'
+          
+          const container = document.createElement('div')
+          placeholder.replaceWith(container)
+          
+          const root = createRoot(container)
+          root.render(<ResourceHTML src={src} title={title} />)
+          resourceRootsRef.current.push(root)
+        })
+        
+        // Find all file/folder resource placeholders and replace with React components
+        const filePlaceholders = contentRef.current.querySelectorAll('.resource-file-placeholder')
+        filePlaceholders.forEach(placeholder => {
+          const path = placeholder.getAttribute('data-path') || ''
+          const name = placeholder.getAttribute('data-name') || 'Resource'
+          const type = placeholder.getAttribute('data-file-type') as 'file' | 'folder' || 'file'
+          
+          const container = document.createElement('div')
+          placeholder.replaceWith(container)
+          
+          const root = createRoot(container)
+          root.render(<ResourceFile path={path} name={name} type={type} />)
+          resourceRootsRef.current.push(root)
+        })
+        
+        // Find all YouTube resource placeholders and replace with React components
+        const youtubePlaceholders = contentRef.current.querySelectorAll('.resource-youtube-placeholder')
+        youtubePlaceholders.forEach(placeholder => {
+          const videoId = placeholder.getAttribute('data-video-id') || ''
+          const title = placeholder.getAttribute('data-title') || 'YouTube Video'
+          
+          const container = document.createElement('div')
+          placeholder.replaceWith(container)
+          
+          const root = createRoot(container)
+          root.render(<ResourceYouTube videoId={videoId} title={title} />)
+          resourceRootsRef.current.push(root)
         })
       }
     }, 0)
@@ -763,6 +1022,15 @@ export function MarkdownRenderer({ filePath, onFileSelect }: MarkdownRendererPro
           }
         })
         scratchspaceRootsRef.current = []
+        
+        resourceRootsRef.current.forEach(root => {
+          try {
+            root.unmount()
+          } catch (e) {
+            // Ignore errors during cleanup
+          }
+        })
+        resourceRootsRef.current = []
       }, 0)
     }
   }, [content, onFileSelect])

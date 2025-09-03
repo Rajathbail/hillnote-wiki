@@ -4,7 +4,7 @@
       "name": "Connect with ChatGPT",
       "path": "documents/Connect/Connect with ChatGPT.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.032Z",
+      "lastModified": "2025-09-03T06:39:34.287Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -16,7 +16,7 @@
       "name": "Connect with Claude ",
       "path": "documents/Connect/Connect with Claude .md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.032Z",
+      "lastModified": "2025-09-03T06:39:34.287Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -28,7 +28,7 @@
       "name": "Connect with Deepseek",
       "path": "documents/Connect/Connect with Deepseek.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.032Z",
+      "lastModified": "2025-09-03T06:39:34.287Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -40,7 +40,7 @@
       "name": "Connect with Gemini",
       "path": "documents/Connect/Connect with Gemini.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.032Z",
+      "lastModified": "2025-09-03T06:39:34.287Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -52,7 +52,7 @@
       "name": "Connect with Grok",
       "path": "documents/Connect/Connect with Grok.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.032Z",
+      "lastModified": "2025-09-03T06:39:34.287Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -64,7 +64,7 @@
       "name": "Connect with Perplexity",
       "path": "documents/Connect/Connect with Perplexity.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.032Z",
+      "lastModified": "2025-09-03T06:39:34.287Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -76,7 +76,7 @@
       "name": "Pair with Cursor",
       "path": "documents/Pair with/Pair with Cursor.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.034Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [],
       "containsReferencesTo": [],
@@ -86,7 +86,7 @@
       "name": "Pair with Github CoPilot",
       "path": "documents/Pair with/Pair with Github CoPilot.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.034Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [],
       "containsReferencesTo": [],
@@ -96,7 +96,7 @@
       "name": "GDrive",
       "path": "documents/Sync & Collaborate/GDrive.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [],
       "containsReferencesTo": [],
@@ -106,7 +106,7 @@
       "name": "Github",
       "path": "documents/Sync & Collaborate/Github.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [],
       "containsReferencesTo": [],
@@ -116,7 +116,7 @@
       "name": "About the Editor",
       "path": "documents/About the Editor.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -130,7 +130,7 @@
       "name": "AI in Hillnote",
       "path": "documents/AI in Hillnote.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -142,7 +142,7 @@
       "name": "Connecting to Hillnote",
       "path": "documents/Connecting to Hillnote.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -154,7 +154,7 @@
       "name": "Get in touch",
       "path": "documents/Get in touch.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [],
       "containsReferencesTo": [],
@@ -164,7 +164,7 @@
       "name": "Make it yours",
       "path": "documents/Make it yours.md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [
         "documents/Start Here .md"
@@ -176,7 +176,7 @@
       "name": "Start Here ",
       "path": "documents/Start Here .md",
       "type": "document",
-      "lastModified": "2025-09-02T08:30:30.035Z",
+      "lastModified": "2025-09-03T06:39:34.290Z",
       "description": "",
       "referencedIn": [
         "documents/About the Editor.md"

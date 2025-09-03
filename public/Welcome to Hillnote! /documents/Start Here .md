@@ -1,4 +1,4 @@
-# **==Hello! 👋🏽==**
+# **==Welcome to Hillnote! 👋🏽==**
 
 Welcome to Hillnote! We’re so excited to have you here and thank you for giving it a try. 🎉
 
@@ -19,6 +19,8 @@ Within Hillnote, everything is organised inside of a workspace document – you 
 
 ![](resources/images/Start Here/1755083595272.png)**An example of what this workspace will look like if you are on a mac 👆**  
 [[About the Editor|doc:documents/About the Editor.md]] goes over what each file/folder does
+
+[youtube:YouTube Video](mj0R5GblJ0M)
 
 # ==What next?==
 

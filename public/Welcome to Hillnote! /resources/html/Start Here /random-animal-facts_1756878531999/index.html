@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Animal Fact Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .animal-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .fact-container {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s ease;
+        }
+
+        .fact-container.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .fact-title {
+            color: white;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .fact-content {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .generate-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(238, 90, 36, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .generate-btn:hover {
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(238, 90, 36, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fact-number {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .animal-emoji {
+                font-size: 3em;
+            }
+            
+            .fact-container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦁 Animal Facts</h1>
+        <div class="animal-emoji" id="animalEmoji">🌟</div>
+        
+        <div class="fact-container" id="factContainer">
+            <div class="fact-title" id="factTitle">Ready for an amazing animal fact?</div>
+            <div class="fact-content" id="factContent">Click the button below to discover something incredible about the animal kingdom!</div>
+        </div>
+        
+        <button class="generate-btn" id="generateBtn" onclick="generateRandomFact()">
+            <span id="btnText">Get Random Fact!</span>
+        </button>
+    </div>
+
+    <script>
+        const animalFacts = [
+            {
+                title: "Dolphins Sleep with Half Their Brain Awake",
+                content: "Dolphins can't fully go to sleep like humans do - they need to stay partially conscious to breathe. To solve this, they let one half of their brain sleep while keeping the other half awake. This is called unihemispheric sleep, and it also allows them to stay alert for potential predators.",
+                emoji: "🐬"
+            },
+            {
+                title: "Mantis Shrimp Have the Most Complex Eyes",
+                content: "Mantis shrimp can see 16 types of color receptors (humans only have 3) and can detect ultraviolet, visible, and polarized light. They can see circular polarized light, which no other animal on Earth can do, making their vision more complex than any camera ever created.",
+                emoji: "🦐"
+            },
+            {
+                title: "Penguins Propose with Pebbles",
+                content: "Male penguins search for the perfect pebble to present to their chosen mate as a proposal gift. If the female accepts the pebble, they become partners for the breeding season, and some species mate for life, continuing to exchange pebbles as tokens of affection.",
+                emoji: "🐧"
+            },
+            {
+                title: "Sloths Only Defecate Once a Week",
+                content: "Sloths have an incredibly slow metabolism and only climb down from trees to defecate once every 5-7 days. This dangerous journey to the forest floor uses up to 30% of their daily energy and makes them vulnerable to predators, but it's essential for their survival.",
+                emoji: "🦥"
+            },
+            {
+                title: "Crows Can Hold Grudges for Generations",
+                content: "Crows not only remember individual human faces but can pass down information about dangerous people to their offspring. Research shows that crows can hold grudges against specific humans for years and teach their young to recognize and avoid these threats.",
+                emoji: "🐦‍⬛"
+            },
+            {
+                title: "Male Lions' Manes Signal Their Strength",
+                content: "A male lion's mane is not just for show - its length, thickness, and color indicate the lion's health, testosterone levels, and fighting ability. Darker, fuller manes typically belong to stronger, healthier lions, and females tend to prefer males with darker manes.",
+                emoji: "🦁"
+            },
+            {
+                title: "Tigers Have Striped Skin, Not Just Fur",
+                content: "Tigers' distinctive stripes aren't just in their fur - the pattern is also present on their skin. If you were to shave a tiger, you would still see their stripes! This unique characteristic makes each tiger's pattern as unique as a human fingerprint.",
+                emoji: "🐅"
+            },
+            {
+                title: "Wombat Poop is Cube-Shaped",
+                content: "Wombats are the only animals that produce cube-shaped feces. Their intestines have varying elasticity that creates this unique shape, which prevents the droppings from rolling away and helps wombats mark their territory more effectively.",
+                emoji: "🐨"
+            },
+            {
+                title: "Axolotls Can Regenerate Entire Limbs",
+                content: "Axolotls can regrow not just limbs, but also parts of their heart, brain, and spinal cord with perfect functionality. They can regenerate the same limb hundreds of times throughout their lifetime, making them invaluable for medical research.",
+                emoji: "🦎"
+            },
+            {
+                title: "Honeybees Dance to Communicate Directions",
+                content: "Honeybees perform a 'waggle dance' to tell other bees exactly where to find flowers. The angle of the dance indicates direction relative to the sun, while the duration of the waggle run communicates the distance to the food source.",
+                emoji: "🐝"
+            },
+            {
+                title: "Octopuses Have Multiple Hearts",
+                content: "Octopuses have three hearts: two pump blood to the gills, while the third circulates blood to the rest of the body. When they swim, their main heart actually stops beating, which is partly why they tend to crawl more than swim.",
+                emoji: "🐙"
+            },
+            {
+                title: "Hummingbirds Can Fly Backwards",
+                content: "Hummingbirds are the only birds that can fly backwards and upside down. They can also hover in mid-air, fly sideways, and even do somersaults. Their wings can beat up to 80 times per second, allowing them this incredible aerial maneuverability.",
+                emoji: "🐦"
+            }
+        ];
+
+        let currentFactIndex = -1;
+
+        function generateRandomFact() {
+            const btn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+            const factContainer = document.getElementById('factContainer');
+            const factTitle = document.getElementById('factTitle');
+            const factContent = document.getElementById('factContent');
+            const animalEmoji = document.getElementById('animalEmoji');
+
+            // Disable button and show loading
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading"></span>Generating...';
+            
+            // Hide current fact
+            factContainer.classList.remove('show');
+
+            setTimeout(() => {
+                // Get random fact (avoid repeating the same fact)
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * animalFacts.length);
+                } while (randomIndex === currentFactIndex && animalFacts.length > 1);
+                
+                currentFactIndex = randomIndex;
+                const fact = animalFacts[randomIndex];
+
+                // Update content
+                factTitle.textContent = fact.title;
+                factContent.innerHTML = fact.content + `<div class="fact-number">Fact ${randomIndex + 1} of ${animalFacts.length}</div>`;
+                animalEmoji.textContent = fact.emoji;
+
+                // Show new fact
+                setTimeout(() => {
+                    factContainer.classList.add('show');
+                    
+                    // Re-enable button
+                    btn.disabled = false;
+                    btnText.textContent = 'Get Another Fact!';
+                }, 100);
+            }, 500);
+        }
+
+        // Show initial state
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('factContainer').classList.add('show');
+        });
+    </script>
+</body>
+</html>
