@@ -1,0 +1,75 @@
+{
+  "documents": [
+    {
+      "name": "And an empty file",
+      "path": "documents/Folder/And an empty file.md",
+      "type": "document",
+      "lastModified": "2025-09-03T17:26:02.201Z",
+      "description": "",
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "emoji": "🎺"
+    },
+    {
+      "name": "Capabilities",
+      "path": "documents/Capabilities.md",
+      "type": "document",
+      "lastModified": "2025-09-03T17:26:02.201Z",
+      "description": "",
+      "referencedIn": [
+        "documents/Start here! .md"
+      ],
+      "containsReferencesTo": [],
+      "emoji": "🦈"
+    },
+    {
+      "name": "Editing these files",
+      "path": "documents/Editing these files.md",
+      "type": "document",
+      "lastModified": "2025-09-03T17:26:02.201Z",
+      "description": "",
+      "referencedIn": [
+        "documents/Start here! .md"
+      ],
+      "containsReferencesTo": [],
+      "emoji": "🥨"
+    },
+    {
+      "name": "Setting up the NPM",
+      "path": "documents/Setting up the NPM.md",
+      "type": "document",
+      "lastModified": "2025-09-03T17:26:02.201Z",
+      "description": "",
+      "referencedIn": [
+        "documents/Start here! .md"
+      ],
+      "containsReferencesTo": [],
+      "emoji": "🛹"
+    },
+    {
+      "name": "Start here! ",
+      "path": "documents/Start here! .md",
+      "type": "document",
+      "lastModified": "2025-09-03T17:26:02.201Z",
+      "description": "",
+      "referencedIn": [],
+      "containsReferencesTo": [
+        "documents/Editing these files.md",
+        "documents/Capabilities.md",
+        "documents/Setting up the NPM.md"
+      ],
+      "emoji": "🌵"
+    }
+  ],
+  "folders": [
+    {
+      "name": "Folder",
+      "path": "documents/Folder",
+      "type": "folder",
+      "description": "",
+      "documentCount": 1,
+      "referencedIn": [],
+      "containsReferencesTo": []
+    }
+  ]
+}

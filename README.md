@@ -23,6 +23,7 @@ Create a new page in your Next.js app:
 "use client"
 
 import { Document, Navbar, ThemeProvider, ConfigProvider } from '@hillnote/wiki'
+import { useEffect, useState } from 'react'
 
 const wikiConfig = {
   siteName: "My Documentation",
@@ -43,6 +44,18 @@ const wikiConfig = {
 }
 
 export default function WikiPage() {
+  // Prevent hydration errors with theme provider
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  // Don't render on server to avoid hydration mismatch
+  if (!mounted) {
+    return null
+  }
+  
   return (
     <ConfigProvider config={wikiConfig}>
       <ThemeProvider>
@@ -285,6 +298,12 @@ export default function App({ children }) {
 }
 ```
 
+## Troubleshooting
+
+### Hydration Errors
+
+If you encounter hydration errors with Next.js, ensure you're using the client-side mounting pattern shown in the Quick Start example. The `mounted` state prevents theme-related attributes from causing mismatches between server and client rendering.
+
 ## Workspace Structure
 
 Your Hillnote workspace should have this structure in your public folder:
@@ -352,4 +371,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-For issues and questions, please visit our [GitHub repository](https://github.com/yourusername/hillnote-wiki).
+For issues and questions, please visit our [GitHub repository](https://github.com/Rajathbail/hillnote-wiki).

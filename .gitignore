@@ -3,6 +3,7 @@
 # dependencies
 /Nextjs Boilerplate/node_modules
 /hillnote-wiki-package/node_modules
+/npmexample/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -21,6 +22,7 @@
 # production
 Nextjs Boilerplate/build
 hillnote-wiki-package/build
+npmexample/build
 
 # misc
 .DS_Store
