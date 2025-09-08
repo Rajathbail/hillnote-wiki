@@ -460,7 +460,7 @@ function TaskCheckbox({ checked, disabled = true }) {
   )
 }
 
-export function MarkdownRenderer({ filePath, onFileSelect }) {
+export function MarkdownRenderer({ filePath, onFileSelect, preloadedContent }) {
   const [content, setContent] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -573,17 +573,31 @@ export function MarkdownRenderer({ filePath, onFileSelect }) {
           console.warn('Could not load documents registry:', registryError)
         }
         
-        // Construct the URL to the markdown file
-        // Normalize the file path - remove leading slash if present
-        const normalizedPath = resolvedPath.startsWith('/') ? resolvedPath.slice(1) : resolvedPath
-        const fileUrl = `${siteConfig.workspace.path}${normalizedPath}`
-        const response = await fetch(fileUrl)
+        let markdown
         
-        if (!response.ok) {
-          throw new Error(`Failed to load file: ${response.statusText}`)
+        // Use preloaded content if available (for SSG pages)
+        if (preloadedContent) {
+          markdown = preloadedContent
+        } else {
+          // Check sessionStorage for SSG content
+          const cachedContent = sessionStorage.getItem(`doc-content-${filePath}`)
+          if (cachedContent) {
+            markdown = cachedContent
+          } else {
+            // Fallback to fetching the file (for development or non-SSG pages)
+            // Construct the URL to the markdown file
+            // Normalize the file path - remove leading slash if present
+            const normalizedPath = resolvedPath.startsWith('/') ? resolvedPath.slice(1) : resolvedPath
+            const fileUrl = `${siteConfig.workspace.path}${normalizedPath}`
+            const response = await fetch(fileUrl)
+            
+            if (!response.ok) {
+              throw new Error(`Failed to load file: ${response.statusText}`)
+            }
+            
+            markdown = await response.text()
+          }
         }
-        
-        let markdown = await response.text()
         
         // Extract comments if enabled
         let extractedComments = []

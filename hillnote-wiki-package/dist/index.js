@@ -4,6 +4,9 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
@@ -26,9 +29,127 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
+// src/lib/workspace.js
+var workspace_exports = {};
+__export(workspace_exports, {
+  buildFileTree: () => buildFileTree,
+  fetchWorkspaceRegistry: () => fetchWorkspaceRegistry,
+  getWorkspaceFileTree: () => getWorkspaceFileTree
+});
+function buildFileTree(registry, siteConfig) {
+  var _a, _b, _c, _d;
+  const tree = [];
+  const nodeMap = /* @__PURE__ */ new Map();
+  const orderMap = /* @__PURE__ */ new Map();
+  (_a = registry.documents) == null ? void 0 : _a.forEach((doc, index) => {
+    orderMap.set(doc.path, index);
+  });
+  (_b = registry.folders) == null ? void 0 : _b.forEach((folder, index) => {
+    var _a2;
+    orderMap.set(folder.path, index + (((_a2 = registry.documents) == null ? void 0 : _a2.length) || 0));
+  });
+  (_c = registry.folders) == null ? void 0 : _c.forEach((folder) => {
+    const pathParts = folder.path.split("/");
+    const folderName = pathParts[pathParts.length - 1];
+    const node = {
+      id: folder.path,
+      name: folderName,
+      type: "directory",
+      path: folder.path,
+      emoji: folder.emoji || "\u{1F4C1}",
+      children: []
+    };
+    nodeMap.set(folder.path, node);
+  });
+  (_d = registry.documents) == null ? void 0 : _d.forEach((doc) => {
+    const pathParts = doc.path.split("/");
+    const fileName = pathParts[pathParts.length - 1];
+    const node = {
+      id: doc.path,
+      name: fileName,
+      type: "file",
+      path: doc.path,
+      emoji: doc.emoji || "\u{1F335}"
+    };
+    nodeMap.set(doc.path, node);
+  });
+  nodeMap.forEach((node, path) => {
+    const pathParts = path.split("/");
+    if (pathParts.length === 2) {
+      tree.push(node);
+    } else if (pathParts.length > 2) {
+      const parentPath = pathParts.slice(0, -1).join("/");
+      const parent = nodeMap.get(parentPath);
+      if (parent && parent.children) {
+        parent.children.push(node);
+      } else {
+        tree.push(node);
+      }
+    }
+  });
+  const sortNodes = (nodes) => {
+    nodes.sort((a, b) => {
+      var _a2;
+      if (((_a2 = siteConfig == null ? void 0 : siteConfig.workspace) == null ? void 0 : _a2.customOrder) && siteConfig.workspace.customOrder.length > 0) {
+        const customIndexA = siteConfig.workspace.customOrder.indexOf(a.path);
+        const customIndexB = siteConfig.workspace.customOrder.indexOf(b.path);
+        if (customIndexA !== -1 && customIndexB !== -1) {
+          return customIndexA - customIndexB;
+        }
+        if (customIndexA !== -1) return -1;
+        if (customIndexB !== -1) return 1;
+      }
+      const orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER;
+      const orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
+    nodes.forEach((node) => {
+      if (node.children && node.children.length > 0) {
+        sortNodes(node.children);
+      }
+    });
+  };
+  sortNodes(tree);
+  return tree;
+}
+async function fetchWorkspaceRegistry(siteConfig) {
+  var _a;
+  if (!((_a = siteConfig == null ? void 0 : siteConfig.workspace) == null ? void 0 : _a.enabled)) {
+    return null;
+  }
+  try {
+    const registryPath = `${siteConfig.workspace.path}${siteConfig.workspace.registryFile}`;
+    const response = await fetch(registryPath);
+    if (!response.ok) {
+      console.error("Failed to fetch workspace registry:", response.statusText);
+      return null;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error loading workspace registry:", error);
+    return null;
+  }
+}
+async function getWorkspaceFileTree(siteConfig) {
+  const registry = await fetchWorkspaceRegistry(siteConfig);
+  if (!registry) {
+    return [];
+  }
+  return buildFileTree(registry, siteConfig);
+}
+var init_workspace = __esm({
+  "src/lib/workspace.js"() {
+  }
+});
+
 // src/index.js
 var index_exports = {};
 __export(index_exports, {
+  Accordion: () => Accordion,
+  AccordionContent: () => AccordionContent,
+  AccordionItem: () => AccordionItem,
+  AccordionTrigger: () => AccordionTrigger,
   Button: () => Button,
   Checkbox: () => Checkbox,
   ConfigProvider: () => ConfigProvider,
@@ -65,14 +186,31 @@ __export(index_exports, {
   ScrollArea: () => ScrollArea,
   ScrollBar: () => ScrollBar,
   Separator: () => Separator2,
+  Sheet: () => Sheet,
+  SheetClose: () => SheetClose,
+  SheetContent: () => SheetContent,
+  SheetDescription: () => SheetDescription,
+  SheetFooter: () => SheetFooter,
+  SheetHeader: () => SheetHeader,
+  SheetOverlay: () => SheetOverlay,
+  SheetPortal: () => SheetPortal,
+  SheetTitle: () => SheetTitle,
+  SheetTrigger: () => SheetTrigger,
   TableOfContents: () => TableOfContents2,
   Tabs: () => Tabs,
   TabsContent: () => TabsContent,
   TabsList: () => TabsList,
   TabsTrigger: () => TabsTrigger,
   ThemeProvider: () => ThemeProvider,
+  buildFileTree: () => buildFileTree,
   buttonVariants: () => buttonVariants,
+  createSlugMap: () => createSlugMap,
   defaultConfig: () => defaultConfig,
+  fetchWorkspaceRegistry: () => fetchWorkspaceRegistry,
+  getWorkspaceFileTree: () => getWorkspaceFileTree,
+  initializeSlugMapping: () => initializeSlugMapping,
+  pathToSlug: () => pathToSlug,
+  slugToPath: () => slugToPath,
   useConfig: () => useConfig
 });
 module.exports = __toCommonJS(index_exports);
@@ -166,15 +304,15 @@ var Navbar = ({
   className = "",
   children
 }) => {
-  return /* @__PURE__ */ import_react.default.createElement("header", { className: `h-16 bg-background flex items-center justify-between px-8 pt-8 pb-4 ${className}` }, showSiteName && /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "font-semibold text-lg" }, siteName)), /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center gap-4" }, children, showThemeToggle && /* @__PURE__ */ import_react.default.createElement(ThemeToggle, null)));
+  return /* @__PURE__ */ import_react.default.createElement("header", { className: `h-16 bg-background flex items-center justify-between px-4 md:px-8 pt-8 pb-4 ${className}` }, showSiteName && /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "font-semibold text-lg" }, siteName)), /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center gap-4" }, children, showThemeToggle && /* @__PURE__ */ import_react.default.createElement(ThemeToggle, null)));
 };
 
 // src/components/wiki/Document.jsx
 var import_react11 = __toESM(require("react"));
 
 // src/components/navigation-sidebar.jsx
-var import_react3 = __toESM(require("react"));
-var import_lucide_react2 = require("lucide-react");
+var import_react2 = __toESM(require("react"));
+var import_lucide_react3 = require("lucide-react");
 
 // src/components/ui/scroll-area.jsx
 var React4 = __toESM(require("react"));
@@ -231,135 +369,116 @@ function ScrollBar({
   );
 }
 
-// src/lib/workspace.js
-function buildFileTree(registry, config) {
-  var _a, _b, _c, _d;
-  const tree = [];
-  const nodeMap = /* @__PURE__ */ new Map();
-  const orderMap = /* @__PURE__ */ new Map();
-  (_a = registry.documents) == null ? void 0 : _a.forEach((doc, index) => {
-    orderMap.set(doc.path, index);
-  });
-  (_b = registry.folders) == null ? void 0 : _b.forEach((folder, index) => {
-    var _a2;
-    orderMap.set(folder.path, index + (((_a2 = registry.documents) == null ? void 0 : _a2.length) || 0));
-  });
-  (_c = registry.folders) == null ? void 0 : _c.forEach((folder) => {
-    const pathParts = folder.path.split("/");
-    const folderName = pathParts[pathParts.length - 1];
-    const node = {
-      id: folder.path,
-      name: folderName,
-      type: "directory",
-      path: folder.path,
-      emoji: folder.emoji || "\u{1F4C1}",
-      children: []
-    };
-    nodeMap.set(folder.path, node);
-  });
-  (_d = registry.documents) == null ? void 0 : _d.forEach((doc) => {
-    const pathParts = doc.path.split("/");
-    const fileName = pathParts[pathParts.length - 1];
-    const node = {
-      id: doc.path,
-      name: fileName,
-      type: "file",
-      path: doc.path,
-      emoji: doc.emoji || "\u{1F335}"
-    };
-    nodeMap.set(doc.path, node);
-  });
-  nodeMap.forEach((node, path) => {
-    const pathParts = path.split("/");
-    if (pathParts.length === 2) {
-      tree.push(node);
-    } else if (pathParts.length > 2) {
-      const parentPath = pathParts.slice(0, -1).join("/");
-      const parent = nodeMap.get(parentPath);
-      if (parent && parent.children) {
-        parent.children.push(node);
-      } else {
-        tree.push(node);
-      }
-    }
-  });
-  const sortNodes = (nodes) => {
-    nodes.sort((a, b) => {
-      var _a2;
-      let orderA;
-      let orderB;
-      if (((_a2 = config == null ? void 0 : config.workspace) == null ? void 0 : _a2.customOrder) && config.workspace.customOrder.length > 0) {
-        const customIndexA = config.workspace.customOrder.indexOf(a.path);
-        const customIndexB = config.workspace.customOrder.indexOf(b.path);
-        if (customIndexA !== -1 && customIndexB !== -1) {
-          return customIndexA - customIndexB;
-        }
-        if (customIndexA !== -1) return -1;
-        if (customIndexB !== -1) return 1;
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER;
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER;
-      } else {
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER;
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER;
-      }
-      return orderA - orderB;
-    });
-    nodes.forEach((node) => {
-      if (node.children && node.children.length > 0) {
-        sortNodes(node.children);
-      }
-    });
-  };
-  sortNodes(tree);
-  return tree;
-}
-async function fetchWorkspaceRegistry(config) {
-  var _a;
-  if (!((_a = config == null ? void 0 : config.workspace) == null ? void 0 : _a.enabled)) {
-    return null;
+// src/components/ui/accordion.jsx
+var React5 = __toESM(require("react"));
+var AccordionPrimitive = __toESM(require("@radix-ui/react-accordion"));
+var import_lucide_react2 = require("lucide-react");
+var Accordion = AccordionPrimitive.Root;
+var AccordionItem = React5.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React5.createElement(
+  AccordionPrimitive.Item,
+  {
+    ref,
+    className: cn("", className),
+    ...props
   }
-  try {
-    const registryPath = `${config.workspace.path}${config.workspace.registryFile}`;
-    const response = await fetch(registryPath);
-    if (!response.ok) {
-      console.error("Failed to fetch workspace registry:", response.statusText);
-      return null;
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error loading workspace registry:", error);
-    return null;
-  }
-}
-async function getWorkspaceFileTree(config) {
-  const registry = await fetchWorkspaceRegistry(config);
-  if (!registry) {
-    return [];
-  }
-  return buildFileTree(registry, config);
-}
-
-// src/components/ConfigProvider.jsx
-var import_react2 = __toESM(require("react"));
-var ConfigContext = (0, import_react2.createContext)(null);
-function ConfigProvider({ children, config }) {
-  return /* @__PURE__ */ import_react2.default.createElement(ConfigContext.Provider, { value: config }, children);
-}
-function useConfig() {
-  const config = (0, import_react2.useContext)(ConfigContext);
-  if (!config) {
-    throw new Error("useConfig must be used within a ConfigProvider");
-  }
-  return config;
-}
+));
+AccordionItem.displayName = "AccordionItem";
+var AccordionTrigger = React5.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ React5.createElement(AccordionPrimitive.Header, { className: "flex" }, /* @__PURE__ */ React5.createElement(
+  AccordionPrimitive.Trigger,
+  {
+    ref,
+    className: cn(
+      "flex flex-1 items-center justify-between py-2 font-medium transition-all [&[data-state=open]>svg]:rotate-180",
+      className
+    ),
+    ...props
+  },
+  children,
+  /* @__PURE__ */ React5.createElement(import_lucide_react2.ChevronDown, { className: "h-4 w-4 shrink-0 transition-transform duration-200" })
+)));
+AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
+var AccordionContent = React5.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ React5.createElement(
+  AccordionPrimitive.Content,
+  {
+    ref,
+    className: "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+    ...props
+  },
+  /* @__PURE__ */ React5.createElement("div", { className: cn("pb-4 pt-0", className) }, children)
+));
+AccordionContent.displayName = AccordionPrimitive.Content.displayName;
 
 // src/components/navigation-sidebar.jsx
-var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
+init_workspace();
+var folderContainsActiveFile = (node, currentFile) => {
+  if (!node.children || !currentFile) return false;
+  return node.children.some((child) => {
+    if (child.id === currentFile) return true;
+    if (child.children) return folderContainsActiveFile(child, currentFile);
+    return false;
+  });
+};
+var WikiTreeNode = ({ node, currentFile, onFileSelect, parentPath = "", openItems, setOpenItems }) => {
   var _a;
-  const [isExpanded, setIsExpanded] = (0, import_react3.useState)(false);
   const isActive = currentFile === node.id;
   const hasChildren = node.children && node.children.length > 0;
+  const accordionValue = parentPath ? `${parentPath}-${node.id}` : node.id;
+  if (node.type === "file") {
+    return /* @__PURE__ */ import_react2.default.createElement(
+      "button",
+      {
+        className: cn(
+          "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors w-full text-left",
+          isActive ? "bg-accent font-semibold" : "hover:bg-accent/50"
+        ),
+        onClick: () => onFileSelect(node.id)
+      },
+      /* @__PURE__ */ import_react2.default.createElement("span", { className: "break-words" }, node.name.endsWith(".md") ? node.name.replace(/\.md$/, "") : node.name)
+    );
+  }
+  if (!hasChildren) {
+    return /* @__PURE__ */ import_react2.default.createElement("div", { className: "px-3 py-1.5 text-sm text-muted-foreground" }, node.name);
+  }
+  return /* @__PURE__ */ import_react2.default.createElement(
+    Accordion,
+    {
+      type: "single",
+      collapsible: true,
+      className: "w-full",
+      value: openItems.includes(accordionValue) ? accordionValue : "",
+      onValueChange: (value) => {
+        if (value) {
+          setOpenItems((prev) => [...prev.filter((item) => item !== accordionValue), accordionValue]);
+        } else {
+          setOpenItems((prev) => prev.filter((item) => item !== accordionValue));
+        }
+      }
+    },
+    /* @__PURE__ */ import_react2.default.createElement(AccordionItem, { value: accordionValue, className: "border-b-0" }, /* @__PURE__ */ import_react2.default.createElement(AccordionTrigger, { className: "px-3 py-2 text-sm hover:no-underline hover:bg-accent/50 rounded-md" }, node.name), /* @__PURE__ */ import_react2.default.createElement(AccordionContent, { className: "pl-3" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex flex-col space-y-1" }, (_a = node.children) == null ? void 0 : _a.map((child) => /* @__PURE__ */ import_react2.default.createElement(
+      WikiTreeNode,
+      {
+        key: child.id,
+        node: child,
+        currentFile,
+        onFileSelect,
+        parentPath: accordionValue,
+        openItems,
+        setOpenItems
+      }
+    )))))
+  );
+};
+var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect, mode = "emoji" }) => {
+  var _a;
+  const shouldBeOpen = folderContainsActiveFile(node, currentFile);
+  const [isExpanded, setIsExpanded] = (0, import_react2.useState)(shouldBeOpen);
+  const isActive = currentFile === node.id;
+  const hasChildren = node.children && node.children.length > 0;
+  (0, import_react2.useEffect)(() => {
+    if (shouldBeOpen) {
+      setIsExpanded(true);
+    }
+  }, [shouldBeOpen, currentFile]);
   const handleClick = () => {
     if (node.type === "file") {
       onFileSelect(node.id);
@@ -367,7 +486,7 @@ var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
       setIsExpanded(!isExpanded);
     }
   };
-  return /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement("div", { className: "relative group" }, /* @__PURE__ */ import_react3.default.createElement(
+  return /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, /* @__PURE__ */ import_react2.default.createElement("div", { className: "relative group" }, /* @__PURE__ */ import_react2.default.createElement(
     "button",
     {
       className: cn(
@@ -377,17 +496,18 @@ var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
       onClick: handleClick,
       style: { paddingLeft: `${level * 8 + 8}px` }
     },
-    node.type === "directory" && /* @__PURE__ */ import_react3.default.createElement("span", { className: "transition-transform" }, isExpanded ? /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.ChevronDown, { className: "h-3 w-3" }) : /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.ChevronRight, { className: "h-3 w-3" })),
-    node.type === "directory" ? isExpanded ? /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-md" }, "\u{1F4C1}") : /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-md" }, "\u{1F4C2}") : /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs ml-5 shrink-0" }, node.emoji || "\u{1F335}"),
-    /* @__PURE__ */ import_react3.default.createElement("span", { className: "truncate" }, node.type === "file" && node.name.endsWith(".md") ? node.name.replace(/\.md$/, "") : node.name)
-  )), isExpanded && hasChildren && /* @__PURE__ */ import_react3.default.createElement("div", { className: "relative" }, (_a = node.children) == null ? void 0 : _a.map((child) => /* @__PURE__ */ import_react3.default.createElement(
+    mode === "emoji" && /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, node.type === "directory" && /* @__PURE__ */ import_react2.default.createElement("span", { className: "transition-transform" }, isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_lucide_react3.ChevronDown, { className: "h-3 w-3" }) : /* @__PURE__ */ import_react2.default.createElement(import_lucide_react3.ChevronRight, { className: "h-3 w-3" })), node.type === "directory" ? isExpanded ? /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-md" }, "\u{1F4C1}") : /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-md" }, "\u{1F4C2}") : /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-xs ml-5 shrink-0" }, node.emoji || "\u{1F335}")),
+    mode === "wiki" && node.type === "directory" && /* @__PURE__ */ import_react2.default.createElement("span", { className: "transition-transform" }, isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_lucide_react3.ChevronDown, { className: "h-3 w-3" }) : /* @__PURE__ */ import_react2.default.createElement(import_lucide_react3.ChevronRight, { className: "h-3 w-3" })),
+    /* @__PURE__ */ import_react2.default.createElement("span", { className: "truncate" }, node.type === "file" && node.name.endsWith(".md") ? node.name.replace(/\.md$/, "") : node.name)
+  )), isExpanded && hasChildren && /* @__PURE__ */ import_react2.default.createElement("div", { className: "relative" }, (_a = node.children) == null ? void 0 : _a.map((child) => /* @__PURE__ */ import_react2.default.createElement(
     TreeNodeComponent,
     {
       key: child.id,
       node: child,
       level: level + 1,
       currentFile,
-      onFileSelect
+      onFileSelect,
+      mode
     }
   ))));
 };
@@ -395,30 +515,61 @@ function NavigationSidebar({
   showTitle = true,
   title = "All Pages",
   onFileSelect,
-  selectedFile
+  selectedFile,
+  siteConfig
 } = {}) {
-  const config = useConfig();
-  const [currentFile, setCurrentFile] = (0, import_react3.useState)(selectedFile || null);
-  const [fileTree, setFileTree] = (0, import_react3.useState)([]);
-  const [isLoading, setIsLoading] = (0, import_react3.useState)(true);
-  const [error, setError] = (0, import_react3.useState)(null);
-  (0, import_react3.useEffect)(() => {
+  var _a;
+  const [currentFile, setCurrentFile] = (0, import_react2.useState)(selectedFile || null);
+  const [fileTree, setFileTree] = (0, import_react2.useState)([]);
+  const [isLoading, setIsLoading] = (0, import_react2.useState)(true);
+  const [error, setError] = (0, import_react2.useState)(null);
+  const [navigationMode, setNavigationMode] = (0, import_react2.useState)(((_a = siteConfig == null ? void 0 : siteConfig.ui) == null ? void 0 : _a.navigationMode) || "emoji");
+  const [openAccordionItems, setOpenAccordionItems] = (0, import_react2.useState)([]);
+  (0, import_react2.useEffect)(() => {
     setCurrentFile(selectedFile || null);
   }, [selectedFile]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react2.useEffect)(() => {
+    if (navigationMode === "wiki" && currentFile && fileTree.length > 0) {
+      const findPathToFile = (nodes, targetId, currentPath = []) => {
+        for (const node of nodes) {
+          if (node.id === targetId) {
+            return currentPath;
+          }
+          if (node.children) {
+            const path = findPathToFile(node.children, targetId, [...currentPath, currentPath.length > 0 ? `${currentPath[currentPath.length - 1]}-${node.id}` : node.id]);
+            if (path) return path;
+          }
+        }
+        return null;
+      };
+      const pathToOpen = findPathToFile(fileTree, currentFile);
+      if (pathToOpen) {
+        setOpenAccordionItems((prev) => {
+          const newItems = [...prev];
+          pathToOpen.forEach((item) => {
+            if (!newItems.includes(item)) {
+              newItems.push(item);
+            }
+          });
+          return newItems;
+        });
+      }
+    }
+  }, [currentFile, fileTree, navigationMode]);
+  (0, import_react2.useEffect)(() => {
     const loadWorkspace = async () => {
-      var _a;
+      var _a2, _b;
       try {
         setIsLoading(true);
         setError(null);
-        if ((_a = config == null ? void 0 : config.workspace) == null ? void 0 : _a.enabled) {
-          const tree = await getWorkspaceFileTree(config);
+        if ((_a2 = siteConfig == null ? void 0 : siteConfig.workspace) == null ? void 0 : _a2.enabled) {
+          const tree = await getWorkspaceFileTree(siteConfig);
           setFileTree(tree);
           if (tree.length === 0) {
             setError("No documents found in workspace");
           } else {
-            if (config.workspace.initialFile && !currentFile) {
-              const initialFile = config.workspace.initialFile;
+            if (((_b = siteConfig == null ? void 0 : siteConfig.workspace) == null ? void 0 : _b.initialFile) && !currentFile) {
+              const initialFile = siteConfig.workspace.initialFile;
               setCurrentFile(initialFile);
               if (onFileSelect) {
                 onFileSelect(initialFile);
@@ -450,7 +601,22 @@ function NavigationSidebar({
     };
     loadWorkspace();
   }, []);
-  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "h-full p-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "h-full flex flex-col overflow-hidden" }, showTitle && /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-3 pt-6" }, /* @__PURE__ */ import_react3.default.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ import_react3.default.createElement(ScrollArea, { className: "mt-4 flex-1 px-2 py-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex flex-col space-y-1" }, isLoading ? /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-center py-8" }, /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.Loader2, { className: "h-6 w-6 animate-spin text-muted-foreground" })) : error ? /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, error) : fileTree.length === 0 ? /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, "No documents found") : fileTree.map((node) => /* @__PURE__ */ import_react3.default.createElement(
+  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "h-full flex flex-col p-3" }, showTitle && /* @__PURE__ */ import_react2.default.createElement("div", { className: "px-3 pt-6 pb-4" }, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex-1 min-h-0" }, /* @__PURE__ */ import_react2.default.createElement(ScrollArea, { className: "h-full px-2 py-2" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex flex-col space-y-1" }, isLoading ? /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center justify-center py-8" }, /* @__PURE__ */ import_react2.default.createElement(import_lucide_react3.Loader2, { className: "h-6 w-6 animate-spin text-muted-foreground" })) : error ? /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, error) : fileTree.length === 0 ? /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, "No documents found") : navigationMode === "wiki" ? fileTree.map((node) => /* @__PURE__ */ import_react2.default.createElement(
+    WikiTreeNode,
+    {
+      key: node.id,
+      node,
+      currentFile,
+      onFileSelect: (id) => {
+        setCurrentFile(id);
+        if (onFileSelect) {
+          onFileSelect(id);
+        }
+      },
+      openItems: openAccordionItems,
+      setOpenItems: setOpenAccordionItems
+    }
+  )) : fileTree.map((node) => /* @__PURE__ */ import_react2.default.createElement(
     TreeNodeComponent,
     {
       key: node.id,
@@ -462,23 +628,24 @@ function NavigationSidebar({
         if (onFileSelect) {
           onFileSelect(id);
         }
-      }
+      },
+      mode: navigationMode
     }
   ))))));
 }
 
 // src/components/table-of-contents.jsx
-var import_react4 = __toESM(require("react"));
-var import_lucide_react3 = require("lucide-react");
+var import_react3 = __toESM(require("react"));
+var import_lucide_react4 = require("lucide-react");
 function TableOfContents({
   showTitle = true,
   title = "On This Page",
   contentSelector = ".markdown-content"
 } = {}) {
-  const [activeId, setActiveId] = (0, import_react4.useState)("");
-  const [tocItems, setTocItems] = (0, import_react4.useState)([]);
-  const [collapsedItems, setCollapsedItems] = (0, import_react4.useState)(/* @__PURE__ */ new Set());
-  (0, import_react4.useEffect)(() => {
+  const [activeId, setActiveId] = (0, import_react3.useState)("");
+  const [tocItems, setTocItems] = (0, import_react3.useState)([]);
+  const [collapsedItems, setCollapsedItems] = (0, import_react3.useState)(/* @__PURE__ */ new Set());
+  (0, import_react3.useEffect)(() => {
     const extractHeadings = () => {
       const contentElement = document.querySelector(contentSelector);
       if (!contentElement) {
@@ -548,7 +715,7 @@ function TableOfContents({
       observer.disconnect();
     };
   }, [contentSelector]);
-  (0, import_react4.useEffect)(() => {
+  (0, import_react3.useEffect)(() => {
     var _a;
     const handleScroll = () => {
       var _a2;
@@ -661,14 +828,14 @@ function TableOfContents({
     const hasChildren = item.children && item.children.length > 0;
     const isCollapsed = collapsedItems.has(item.id);
     const isActive = activeId === item.id;
-    return /* @__PURE__ */ import_react4.default.createElement("div", { key: item.id }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center" }, hasChildren && /* @__PURE__ */ import_react4.default.createElement(
+    return /* @__PURE__ */ import_react3.default.createElement("div", { key: item.id }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center" }, hasChildren && /* @__PURE__ */ import_react3.default.createElement(
       "button",
       {
         onClick: (e) => toggleCollapse(e, item.id),
         className: "p-0.5 hover:bg-accent/50 rounded mr-1"
       },
-      isCollapsed ? /* @__PURE__ */ import_react4.default.createElement(import_lucide_react3.ChevronRight, { className: "h-3 w-3" }) : /* @__PURE__ */ import_react4.default.createElement(import_lucide_react3.ChevronDown, { className: "h-3 w-3" })
-    ), /* @__PURE__ */ import_react4.default.createElement(
+      isCollapsed ? /* @__PURE__ */ import_react3.default.createElement(import_lucide_react4.ChevronRight, { className: "h-3 w-3" }) : /* @__PURE__ */ import_react3.default.createElement(import_lucide_react4.ChevronDown, { className: "h-3 w-3" })
+    ), /* @__PURE__ */ import_react3.default.createElement(
       "button",
       {
         onClick: (e) => handleClick(e, item.id),
@@ -684,24 +851,24 @@ function TableOfContents({
         style: { paddingLeft: `${depth * 12 + 8}px` }
       },
       item.title
-    )), hasChildren && !isCollapsed && /* @__PURE__ */ import_react4.default.createElement("div", null, item.children.map((child) => renderTocItem(child, depth + 1))));
+    )), hasChildren && !isCollapsed && /* @__PURE__ */ import_react3.default.createElement("div", null, item.children.map((child) => renderTocItem(child, depth + 1))));
   };
   if (tocItems.length === 0) {
-    return /* @__PURE__ */ import_react4.default.createElement("div", { className: "h-full p-3" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "h-full flex flex-col bg-muted rounded-lg" }, showTitle && /* @__PURE__ */ import_react4.default.createElement("div", { className: "px-6 pt-6 pb-4" }, /* @__PURE__ */ import_react4.default.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex-1 px-4 py-2 text-sm text-muted-foreground" }, "No headings found")));
+    return /* @__PURE__ */ import_react3.default.createElement("div", { className: "h-full p-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "h-full flex flex-col bg-muted rounded-lg" }, showTitle && /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-6 pt-6 pb-4" }, /* @__PURE__ */ import_react3.default.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex-1 px-4 py-2 text-sm text-muted-foreground" }, "No headings found")));
   }
-  return /* @__PURE__ */ import_react4.default.createElement("div", { className: "h-full p-3" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "h-full flex flex-col" }, showTitle && /* @__PURE__ */ import_react4.default.createElement("div", { className: "px-6 pt-6 pb-4 flex-shrink-0" }, /* @__PURE__ */ import_react4.default.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex-1 overflow-y-auto px-4 py-2" }, /* @__PURE__ */ import_react4.default.createElement("nav", { className: "space-y-1" }, tocItems.map((item) => renderTocItem(item))))));
+  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "h-full p-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "h-full flex flex-col" }, showTitle && /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-6 pt-6 pb-4 flex-shrink-0" }, /* @__PURE__ */ import_react3.default.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex-1 overflow-y-auto px-4 py-2" }, /* @__PURE__ */ import_react3.default.createElement("nav", { className: "space-y-1" }, tocItems.map((item) => renderTocItem(item))))));
 }
 
 // src/components/markdown-renderer.jsx
 var import_react10 = __toESM(require("react"));
 var import_marked = require("marked");
 var import_marked_gfm_heading_id = require("marked-gfm-heading-id");
-var import_lucide_react9 = require("lucide-react");
+var import_lucide_react10 = require("lucide-react");
 
 // src/components/ui/checkbox.jsx
 var React8 = __toESM(require("react"));
 var CheckboxPrimitive = __toESM(require("@radix-ui/react-checkbox"));
-var import_lucide_react4 = require("lucide-react");
+var import_lucide_react5 = require("lucide-react");
 function Checkbox({
   className,
   ...props
@@ -722,7 +889,7 @@ function Checkbox({
         "data-slot": "checkbox-indicator",
         className: "flex items-center justify-center text-current transition-none"
       },
-      /* @__PURE__ */ React8.createElement(import_lucide_react4.CheckIcon, { className: "size-3.5" })
+      /* @__PURE__ */ React8.createElement(import_lucide_react5.CheckIcon, { className: "size-3.5" })
     )
   );
 }
@@ -731,11 +898,11 @@ function Checkbox({
 var import_react7 = __toESM(require("react"));
 
 // src/components/authors-notes.jsx
-var import_react5 = __toESM(require("react"));
-var import_lucide_react5 = require("lucide-react");
+var import_react4 = __toESM(require("react"));
+var import_lucide_react6 = require("lucide-react");
 function AuthorsNotes({ comments }) {
   if (!comments || comments.length === 0) {
-    return /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-sm text-muted-foreground text-center py-8" }, "No comments yet");
+    return /* @__PURE__ */ import_react4.default.createElement("div", { className: "text-sm text-muted-foreground text-center py-8" }, "No comments yet");
   }
   const rootComments = comments.filter((c) => !c.parentId);
   const childComments = comments.filter((c) => c.parentId);
@@ -745,35 +912,49 @@ function AuthorsNotes({ comments }) {
   const renderComment = (comment, depth = 0, isReply = false) => {
     const children = getChildComments(comment.id);
     const initials = comment.author ? comment.author.charAt(0).toUpperCase() : "A";
-    return /* @__PURE__ */ import_react5.default.createElement("div", { key: comment.id, className: `${depth > 0 ? "ml-12" : ""} group` }, /* @__PURE__ */ import_react5.default.createElement("div", { className: `${isReply ? "pl-0" : ""}` }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex gap-3" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-shrink-0" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center" }, /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-sm font-medium text-emerald-500" }, initials))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 mb-1" }, /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-sm font-semibold text-foreground" }, comment.author || "Anonymous"), comment.timestamp && /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-xs text-muted-foreground" }, "\u2022"), /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-xs text-muted-foreground" }, new Date(comment.timestamp).toLocaleDateString("en-US", {
+    return /* @__PURE__ */ import_react4.default.createElement("div", { key: comment.id, className: `${depth > 0 ? "ml-12" : ""} group` }, /* @__PURE__ */ import_react4.default.createElement("div", { className: `${isReply ? "pl-0" : ""}` }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex gap-3" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex-shrink-0" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center" }, /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-sm font-medium text-emerald-500" }, initials))), /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center gap-2 mb-1" }, /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-sm font-semibold text-foreground" }, comment.author || "Anonymous"), comment.timestamp && /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-xs text-muted-foreground" }, "\u2022"), /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-xs text-muted-foreground" }, new Date(comment.timestamp).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit"
-    })))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-sm text-foreground leading-relaxed whitespace-pre-wrap" }, comment.text), children.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-3" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 text-xs text-muted-foreground mb-3" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react5.MessageSquare, { className: "h-3 w-3" }), /* @__PURE__ */ import_react5.default.createElement("span", null, children.length, " ", children.length === 1 ? "reply" : "replies"))))), children.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-4 space-y-4" }, children.map((child) => renderComment(child, depth + 1, true)))), depth === 0 && !isReply && /* @__PURE__ */ import_react5.default.createElement("div", { className: "border-b border-border/50 my-6 last:border-0" }));
+    })))), /* @__PURE__ */ import_react4.default.createElement("div", { className: "text-sm text-foreground leading-relaxed whitespace-pre-wrap" }, comment.text), children.length > 0 && /* @__PURE__ */ import_react4.default.createElement("div", { className: "mt-3" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center gap-2 text-xs text-muted-foreground mb-3" }, /* @__PURE__ */ import_react4.default.createElement(import_lucide_react6.MessageSquare, { className: "h-3 w-3" }), /* @__PURE__ */ import_react4.default.createElement("span", null, children.length, " ", children.length === 1 ? "reply" : "replies"))))), children.length > 0 && /* @__PURE__ */ import_react4.default.createElement("div", { className: "mt-4 space-y-4" }, children.map((child) => renderComment(child, depth + 1, true)))), depth === 0 && !isReply && /* @__PURE__ */ import_react4.default.createElement("div", { className: "border-b border-border/50 my-6 last:border-0" }));
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "space-y-2" }, rootComments.map((comment) => renderComment(comment)));
+  return /* @__PURE__ */ import_react4.default.createElement("div", { className: "space-y-2" }, rootComments.map((comment) => renderComment(comment)));
 }
 
 // src/components/related-documents.jsx
-var import_react6 = __toESM(require("react"));
-var import_lucide_react6 = require("lucide-react");
+var import_react5 = __toESM(require("react"));
+var import_lucide_react7 = require("lucide-react");
 function RelatedDocuments({ documents, onDocumentClick }) {
   if (!documents || documents.length === 0) {
-    return /* @__PURE__ */ import_react6.default.createElement("div", { className: "text-sm text-muted-foreground text-center py-8" }, "No related documents found");
+    return /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-sm text-muted-foreground text-center py-8" }, "No related documents found");
   }
-  return /* @__PURE__ */ import_react6.default.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3" }, documents.map((doc, index) => /* @__PURE__ */ import_react6.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3" }, documents.map((doc, index) => /* @__PURE__ */ import_react5.default.createElement(
     "button",
     {
       key: index,
       onClick: () => onDocumentClick == null ? void 0 : onDocumentClick(doc.path),
       className: "flex items-center gap-3 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 border border-border/50 hover:border-border transition-all text-left group"
     },
-    /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex-shrink-0" }, doc.emoji ? /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-lg" }, doc.emoji) : doc.isFolder ? /* @__PURE__ */ import_react6.default.createElement(import_lucide_react6.FolderOpen, { className: "h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" }) : /* @__PURE__ */ import_react6.default.createElement(import_lucide_react6.Layers, { className: "h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" })),
-    /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "text-sm font-medium group-hover:text-primary transition-colors truncate" }, doc.title)),
-    /* @__PURE__ */ import_react6.default.createElement(import_lucide_react6.ExternalLink, { className: "h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" })
+    /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-shrink-0" }, doc.emoji ? /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-lg" }, doc.emoji) : doc.isFolder ? /* @__PURE__ */ import_react5.default.createElement(import_lucide_react7.FolderOpen, { className: "h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" }) : /* @__PURE__ */ import_react5.default.createElement(import_lucide_react7.Layers, { className: "h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" })),
+    /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-sm font-medium group-hover:text-primary transition-colors truncate" }, doc.title)),
+    /* @__PURE__ */ import_react5.default.createElement(import_lucide_react7.ExternalLink, { className: "h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" })
   )));
+}
+
+// src/components/ConfigProvider.jsx
+var import_react6 = __toESM(require("react"));
+var ConfigContext = (0, import_react6.createContext)(null);
+function ConfigProvider({ children, config }) {
+  return /* @__PURE__ */ import_react6.default.createElement(ConfigContext.Provider, { value: config }, children);
+}
+function useConfig() {
+  const config = (0, import_react6.useContext)(ConfigContext);
+  if (!config) {
+    throw new Error("useConfig must be used within a ConfigProvider");
+  }
+  return config;
 }
 
 // src/components/document-footer.jsx
@@ -825,12 +1006,12 @@ function DocumentFooter({ comments, relatedDocuments, onDocumentClick }) {
 
 // src/components/scratchspace.jsx
 var import_react8 = __toESM(require("react"));
-var import_lucide_react7 = require("lucide-react");
+var import_lucide_react8 = require("lucide-react");
 function ScratchSpace({ title, variant = "default", content, collapsed: initialCollapsed = true }) {
   const [isCollapsed, setIsCollapsed] = (0, import_react8.useState)(initialCollapsed);
   const variantConfig = {
     "ai-response": {
-      icon: /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.Sparkles, { size: 14, className: "sparkle-icon text-purple-500 dark:text-purple-400" }),
+      icon: /* @__PURE__ */ import_react8.default.createElement(import_lucide_react8.Sparkles, { size: 14, className: "sparkle-icon text-purple-500 dark:text-purple-400" }),
       borderClass: "border-purple-300 dark:border-purple-700",
       bgClass: "bg-purple-50/30 dark:bg-purple-900/10",
       shadowClass: "shadow-[0_0_15px_rgba(147,51,234,0.1)] dark:shadow-[0_0_15px_rgba(147,51,234,0.15)]",
@@ -840,7 +1021,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
       defaultTitle: "AI Response"
     },
     "conflict": {
-      icon: /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.AlertTriangle, { size: 14, className: "text-orange-500 dark:text-orange-400" }),
+      icon: /* @__PURE__ */ import_react8.default.createElement(import_lucide_react8.AlertTriangle, { size: 14, className: "text-orange-500 dark:text-orange-400" }),
       borderClass: "border-orange-300 dark:border-orange-700",
       bgClass: "bg-orange-50/30 dark:bg-orange-900/10",
       shadowClass: "shadow-[0_0_15px_rgba(255,165,0,0.1)] dark:shadow-[0_0_15px_rgba(255,165,0,0.15)]",
@@ -850,7 +1031,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
       defaultTitle: "Merge Conflict"
     },
     "conflict-version": {
-      icon: /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.Users, { size: 14, className: "text-yellow-600 dark:text-yellow-400" }),
+      icon: /* @__PURE__ */ import_react8.default.createElement(import_lucide_react8.Users, { size: 14, className: "text-yellow-600 dark:text-yellow-400" }),
       borderClass: "border-yellow-300 dark:border-yellow-700",
       bgClass: "bg-yellow-50/30 dark:bg-yellow-900/10",
       shadowClass: "shadow-[0_0_10px_rgba(255,255,0,0.1)]",
@@ -921,7 +1102,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
             setIsCollapsed(!isCollapsed);
           }
         },
-        isCollapsed ? /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.ChevronRight, { size: 16 }) : /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.ChevronDown, { size: 16 })
+        isCollapsed ? /* @__PURE__ */ import_react8.default.createElement(import_lucide_react8.ChevronRight, { size: 16 }) : /* @__PURE__ */ import_react8.default.createElement(import_lucide_react8.ChevronDown, { size: 16 })
       ), variant === "ai-response" ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "flex items-center gap-1.5 cursor-pointer font-medium truncate" }, config.icon, /* @__PURE__ */ import_react8.default.createElement("span", { className: cn(
         "truncate",
         isCollapsed && "text-muted-foreground",
@@ -962,7 +1143,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
             handleCopy();
           }
         },
-        /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.Copy, { size: 14 })
+        /* @__PURE__ */ import_react8.default.createElement(import_lucide_react8.Copy, { size: 14 })
       ))
     ),
     /* @__PURE__ */ import_react8.default.createElement(
@@ -1000,7 +1181,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
 
 // src/components/resource-tiles.jsx
 var import_react9 = __toESM(require("react"));
-var import_lucide_react8 = require("lucide-react");
+var import_lucide_react9 = require("lucide-react");
 function useSafeConfig() {
   try {
     return useConfig();
@@ -1051,7 +1232,7 @@ function ResourcePDF({ src, title, workspacePath }) {
       title: "Open in new tab",
       "aria-label": "Open in new tab"
     },
-    /* @__PURE__ */ import_react9.default.createElement(import_lucide_react8.ExternalLink, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react9.default.createElement(import_lucide_react9.ExternalLink, { className: "w-4 h-4" })
   ))));
 }
 function ResourceHTML({ src, title, workspacePath }) {
@@ -1097,7 +1278,7 @@ function ResourceHTML({ src, title, workspacePath }) {
       title: "Open in new tab",
       "aria-label": "Open in new tab"
     },
-    /* @__PURE__ */ import_react9.default.createElement(import_lucide_react8.ExternalLink, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react9.default.createElement(import_lucide_react9.ExternalLink, { className: "w-4 h-4" })
   ))));
 }
 function getFileIcon(filename) {
@@ -1237,7 +1418,7 @@ Note: Folders cannot be opened directly in the browser. In the desktop app, this
         title: "Download file",
         "aria-label": "Download file"
       },
-      /* @__PURE__ */ import_react9.default.createElement(import_lucide_react8.Download, { className: "w-4 h-4" })
+      /* @__PURE__ */ import_react9.default.createElement(import_lucide_react9.Download, { className: "w-4 h-4" })
     ), /* @__PURE__ */ import_react9.default.createElement(
       "button",
       {
@@ -1253,7 +1434,7 @@ Note: Folders cannot be opened directly in the browser. In the desktop app, this
         title: type === "folder" ? "Show folder info" : "Show file info",
         "aria-label": type === "folder" ? "Show folder info" : "Show file info"
       },
-      type === "folder" ? /* @__PURE__ */ import_react9.default.createElement(import_lucide_react8.Folder, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react9.default.createElement(import_lucide_react8.File, { className: "w-4 h-4" })
+      type === "folder" ? /* @__PURE__ */ import_react9.default.createElement(import_lucide_react9.Folder, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react9.default.createElement(import_lucide_react9.File, { className: "w-4 h-4" })
     ))
   ));
 }
@@ -1991,7 +2172,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
     };
   }, [content, onFileSelect]);
   if (isLoading) {
-    return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react9.Loader2, { className: "h-8 w-8 animate-spin text-muted-foreground" }));
+    return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react10.Loader2, { className: "h-8 w-8 animate-spin text-muted-foreground" }));
   }
   if (error) {
     return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-muted-foreground" }, error));
@@ -1999,7 +2180,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
   if (!filePath) {
     return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-muted-foreground" }, "Select a document to view"));
   }
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "h-full overflow-auto" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "max-w-4xl mx-auto px-8 pt-4 pb-12" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "mb-8 px-8 py-8 bg-muted rounded-lg" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react9.Layers2, { className: "w-5 h-5 text-primary opacity-20 transition-opacity duration-200" }), /* @__PURE__ */ import_react10.default.createElement("h1", { className: "text-3xl md:text-4xl font-light mt-2" }, documentTitle), /* @__PURE__ */ import_react10.default.createElement("div", { className: "document-title-divider" })), /* @__PURE__ */ import_react10.default.createElement(
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "h-full overflow-auto" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "max-w-4xl mx-auto px-8 pt-4 pb-12" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "mb-8 px-8 py-8 bg-muted rounded-lg" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react10.Layers2, { className: "w-5 h-5 text-primary opacity-20 transition-opacity duration-200" }), /* @__PURE__ */ import_react10.default.createElement("h1", { className: "text-3xl md:text-4xl font-light mt-2" }, documentTitle), /* @__PURE__ */ import_react10.default.createElement("div", { className: "document-title-divider" })), /* @__PURE__ */ import_react10.default.createElement(
     "div",
     {
       ref: contentRef,
@@ -2021,6 +2202,104 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
 }
 
 // src/components/wiki/Document.jsx
+var import_lucide_react12 = require("lucide-react");
+
+// src/components/ui/sheet.jsx
+var React16 = __toESM(require("react"));
+var SheetPrimitive = __toESM(require("@radix-ui/react-dialog"));
+var import_class_variance_authority2 = require("class-variance-authority");
+var import_lucide_react11 = require("lucide-react");
+var Sheet = SheetPrimitive.Root;
+var SheetTrigger = SheetPrimitive.Trigger;
+var SheetClose = SheetPrimitive.Close;
+var SheetPortal = SheetPrimitive.Portal;
+var SheetOverlay = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Overlay,
+  {
+    className: cn(
+      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    ),
+    ...props,
+    ref
+  }
+));
+SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
+var sheetVariants = (0, import_class_variance_authority2.cva)(
+  "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+  {
+    variants: {
+      side: {
+        top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        bottom: "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+        right: "inset-y-0 right-0 h-full w-3/4  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm"
+      }
+    },
+    defaultVariants: {
+      side: "right"
+    }
+  }
+);
+var SheetContent = React16.forwardRef(({ side = "right", className, children, ...props }, ref) => /* @__PURE__ */ React16.createElement(SheetPortal, null, /* @__PURE__ */ React16.createElement(SheetOverlay, null), /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Content,
+  {
+    ref,
+    className: cn(sheetVariants({ side }), className),
+    ...props
+  },
+  children,
+  /* @__PURE__ */ React16.createElement(SheetPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary" }, /* @__PURE__ */ React16.createElement(import_lucide_react11.X, { className: "h-4 w-4" }), /* @__PURE__ */ React16.createElement("span", { className: "sr-only" }, "Close"))
+)));
+SheetContent.displayName = SheetPrimitive.Content.displayName;
+var SheetHeader = ({
+  className,
+  ...props
+}) => /* @__PURE__ */ React16.createElement(
+  "div",
+  {
+    className: cn(
+      "flex flex-col space-y-2 text-center sm:text-left",
+      className
+    ),
+    ...props
+  }
+);
+SheetHeader.displayName = "SheetHeader";
+var SheetFooter = ({
+  className,
+  ...props
+}) => /* @__PURE__ */ React16.createElement(
+  "div",
+  {
+    className: cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      className
+    ),
+    ...props
+  }
+);
+SheetFooter.displayName = "SheetFooter";
+var SheetTitle = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Title,
+  {
+    ref,
+    className: cn("text-lg font-semibold text-foreground", className),
+    ...props
+  }
+));
+SheetTitle.displayName = SheetPrimitive.Title.displayName;
+var SheetDescription = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Description,
+  {
+    ref,
+    className: cn("text-sm text-muted-foreground", className),
+    ...props
+  }
+));
+SheetDescription.displayName = SheetPrimitive.Description.displayName;
+
+// src/components/wiki/Document.jsx
 var Document = ({
   initialFile = null,
   showNavigation = true,
@@ -2028,47 +2307,75 @@ var Document = ({
   navigationTitle = "All Pages",
   tocTitle = "On This Page",
   className = "",
-  onFileSelect: onFileSelectProp
+  onFileSelect: onFileSelectProp,
+  siteConfig = null,
+  serverDocument = null
 }) => {
+  var _a;
   const [selectedFile, setSelectedFile] = (0, import_react11.useState)(initialFile);
+  const [mobileNavOpen, setMobileNavOpen] = (0, import_react11.useState)(false);
+  const [mobileTocOpen, setMobileTocOpen] = (0, import_react11.useState)(false);
   (0, import_react11.useEffect)(() => {
     setSelectedFile(initialFile);
   }, [initialFile]);
   const handleFileSelect = (file) => {
     setSelectedFile(file);
     onFileSelectProp == null ? void 0 : onFileSelectProp(file);
+    setMobileNavOpen(false);
   };
-  const getGridColumns = () => {
-    if (showNavigation && showTableOfContents) return "grid-cols-5";
-    if (showNavigation || showTableOfContents) return "grid-cols-4";
-    return "grid-cols-1";
-  };
-  const getMainColumns = () => {
-    if (showNavigation && showTableOfContents) return "col-span-3";
-    if (showNavigation || showTableOfContents) return "col-span-3";
-    return "col-span-1";
-  };
-  return /* @__PURE__ */ import_react11.default.createElement("div", { className: `flex-1 overflow-hidden ${className}` }, /* @__PURE__ */ import_react11.default.createElement("div", { className: `h-full grid ${getGridColumns()} gap-0 max-w-8xl mx-auto` }, showNavigation && /* @__PURE__ */ import_react11.default.createElement("aside", { className: "col-span-1 border-r border-border border-dashed overflow-y-auto" }, /* @__PURE__ */ import_react11.default.createElement(
+  return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement("div", { className: "md:hidden border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center h-12 px-2" }, showNavigation && /* @__PURE__ */ import_react11.default.createElement(
+    Button,
+    {
+      variant: "ghost",
+      size: "icon",
+      className: "h-9 w-9",
+      onClick: () => setMobileNavOpen(true)
+    },
+    /* @__PURE__ */ import_react11.default.createElement(import_lucide_react12.Menu, { className: "h-5 w-5" })
+  ), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 flex items-center px-2 text-sm text-muted-foreground overflow-hidden" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "truncate" }, selectedFile ? /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement("span", null, "Documents"), /* @__PURE__ */ import_react11.default.createElement(import_lucide_react12.ChevronRight, { className: "h-3 w-3 inline mx-1" }), /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-foreground" }, (_a = selectedFile.split("/").pop()) == null ? void 0 : _a.replace(".md", ""))) : "Select a document")), showTableOfContents && /* @__PURE__ */ import_react11.default.createElement(
+    Button,
+    {
+      variant: "ghost",
+      size: "icon",
+      className: "h-9 w-9 lg:hidden",
+      onClick: () => setMobileTocOpen(true)
+    },
+    /* @__PURE__ */ import_react11.default.createElement(import_lucide_react12.List, { className: "h-5 w-5" })
+  ))), /* @__PURE__ */ import_react11.default.createElement("div", { className: `flex-1 overflow-hidden ${className}` }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "h-full flex max-w-8xl mx-auto" }, showNavigation && /* @__PURE__ */ import_react11.default.createElement("aside", { className: "hidden md:block w-64 border-r border-border border-dashed overflow-y-auto flex-shrink-0" }, /* @__PURE__ */ import_react11.default.createElement(
     NavigationSidebar,
     {
       showTitle: true,
       title: navigationTitle,
       onFileSelect: handleFileSelect,
-      selectedFile
+      selectedFile,
+      siteConfig
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("main", { className: `bg-background overflow-y-auto ${getMainColumns()}` }, /* @__PURE__ */ import_react11.default.createElement(ScrollArea, { className: "h-full" }, /* @__PURE__ */ import_react11.default.createElement(
+  )), /* @__PURE__ */ import_react11.default.createElement("main", { className: "flex-1 bg-background overflow-y-auto" }, /* @__PURE__ */ import_react11.default.createElement(
     MarkdownRenderer,
     {
       filePath: selectedFile,
       onFileSelect: handleFileSelect
     }
-  ))), showTableOfContents && /* @__PURE__ */ import_react11.default.createElement("aside", { className: "col-span-1 overflow-y-auto" }, /* @__PURE__ */ import_react11.default.createElement(
+  )), showTableOfContents && /* @__PURE__ */ import_react11.default.createElement("aside", { className: "hidden lg:block w-64 overflow-y-auto flex-shrink-0" }, /* @__PURE__ */ import_react11.default.createElement(
     TableOfContents,
     {
       showTitle: true,
       title: tocTitle
     }
-  ))));
+  )))), showNavigation && /* @__PURE__ */ import_react11.default.createElement(Sheet, { open: mobileNavOpen, onOpenChange: setMobileNavOpen }, /* @__PURE__ */ import_react11.default.createElement(SheetContent, { side: "left", className: "w-80 p-0 flex flex-col h-full" }, /* @__PURE__ */ import_react11.default.createElement(SheetHeader, { className: "px-6 py-4 border-b" }, /* @__PURE__ */ import_react11.default.createElement(SheetTitle, null, "All Pages")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 overflow-hidden" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "h-full overflow-y-auto" }, /* @__PURE__ */ import_react11.default.createElement(
+    NavigationSidebar,
+    {
+      showTitle: false,
+      onFileSelect: handleFileSelect,
+      selectedFile,
+      siteConfig
+    }
+  ))))), showTableOfContents && /* @__PURE__ */ import_react11.default.createElement(Sheet, { open: mobileTocOpen, onOpenChange: setMobileTocOpen }, /* @__PURE__ */ import_react11.default.createElement(SheetContent, { side: "right", className: "w-80 p-0 flex flex-col h-full" }, /* @__PURE__ */ import_react11.default.createElement(SheetHeader, { className: "px-6 py-4 border-b" }, /* @__PURE__ */ import_react11.default.createElement(SheetTitle, null, "On This Page")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 overflow-hidden" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "h-full overflow-y-auto" }, /* @__PURE__ */ import_react11.default.createElement(
+    TableOfContents,
+    {
+      showTitle: false
+    }
+  ))))));
 };
 
 // src/components/wiki/TableOfContents.jsx
@@ -2088,44 +2395,44 @@ var TableOfContents2 = ({
 };
 
 // src/components/theme-provider.jsx
-var React17 = __toESM(require("react"));
+var React19 = __toESM(require("react"));
 var import_next_themes2 = require("next-themes");
 function ThemeProvider({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ React17.createElement(import_next_themes2.ThemeProvider, { ...props }, children);
+  return /* @__PURE__ */ React19.createElement(import_next_themes2.ThemeProvider, { ...props }, children);
 }
 
 // src/components/ui/dialog.jsx
-var React18 = __toESM(require("react"));
+var React20 = __toESM(require("react"));
 var DialogPrimitive = __toESM(require("@radix-ui/react-dialog"));
-var import_lucide_react10 = require("lucide-react");
+var import_lucide_react13 = require("lucide-react");
 function Dialog({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Root, { "data-slot": "dialog", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Root, { "data-slot": "dialog", ...props });
 }
 function DialogTrigger({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Trigger, { "data-slot": "dialog-trigger", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Trigger, { "data-slot": "dialog-trigger", ...props });
 }
 function DialogPortal({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Portal, { "data-slot": "dialog-portal", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Portal, { "data-slot": "dialog-portal", ...props });
 }
 function DialogClose({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Close, { "data-slot": "dialog-close", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Close, { "data-slot": "dialog-close", ...props });
 }
 function DialogOverlay({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Overlay,
     {
       "data-slot": "dialog-overlay",
@@ -2143,7 +2450,7 @@ function DialogContent({
   showCloseButton = true,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPortal, { "data-slot": "dialog-portal" }, /* @__PURE__ */ React18.createElement(DialogOverlay, null), /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(DialogPortal, { "data-slot": "dialog-portal" }, /* @__PURE__ */ React20.createElement(DialogOverlay, null), /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Content,
     {
       "data-slot": "dialog-content",
@@ -2154,19 +2461,19 @@ function DialogContent({
       ...props
     },
     children,
-    showCloseButton && /* @__PURE__ */ React18.createElement(
+    showCloseButton && /* @__PURE__ */ React20.createElement(
       DialogPrimitive.Close,
       {
         "data-slot": "dialog-close",
         className: "ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
       },
-      /* @__PURE__ */ React18.createElement(import_lucide_react10.XIcon, null),
-      /* @__PURE__ */ React18.createElement("span", { className: "sr-only" }, "Close")
+      /* @__PURE__ */ React20.createElement(import_lucide_react13.XIcon, null),
+      /* @__PURE__ */ React20.createElement("span", { className: "sr-only" }, "Close")
     )
   ));
 }
 function DialogHeader({ className, ...props }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     "div",
     {
       "data-slot": "dialog-header",
@@ -2176,7 +2483,7 @@ function DialogHeader({ className, ...props }) {
   );
 }
 function DialogFooter({ className, ...props }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     "div",
     {
       "data-slot": "dialog-footer",
@@ -2192,7 +2499,7 @@ function DialogTitle({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Title,
     {
       "data-slot": "dialog-title",
@@ -2205,7 +2512,7 @@ function DialogDescription({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Description,
     {
       "data-slot": "dialog-description",
@@ -2216,23 +2523,23 @@ function DialogDescription({
 }
 
 // src/components/ui/dropdown-menu.jsx
-var React19 = __toESM(require("react"));
+var React21 = __toESM(require("react"));
 var DropdownMenuPrimitive = __toESM(require("@radix-ui/react-dropdown-menu"));
-var import_lucide_react11 = require("lucide-react");
+var import_lucide_react14 = require("lucide-react");
 function DropdownMenu({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Root, { "data-slot": "dropdown-menu", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Root, { "data-slot": "dropdown-menu", ...props });
 }
 function DropdownMenuPortal({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Portal, { "data-slot": "dropdown-menu-portal", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Portal, { "data-slot": "dropdown-menu-portal", ...props });
 }
 function DropdownMenuTrigger({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Trigger,
     {
       "data-slot": "dropdown-menu-trigger",
@@ -2245,7 +2552,7 @@ function DropdownMenuContent({
   sideOffset = 4,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Portal, null, /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Portal, null, /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Content,
     {
       "data-slot": "dropdown-menu-content",
@@ -2261,7 +2568,7 @@ function DropdownMenuContent({
 function DropdownMenuGroup({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Group, { "data-slot": "dropdown-menu-group", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Group, { "data-slot": "dropdown-menu-group", ...props });
 }
 function DropdownMenuItem({
   className,
@@ -2269,7 +2576,7 @@ function DropdownMenuItem({
   variant = "default",
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Item,
     {
       "data-slot": "dropdown-menu-item",
@@ -2289,7 +2596,7 @@ function DropdownMenuCheckboxItem({
   checked,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.CheckboxItem,
     {
       "data-slot": "dropdown-menu-checkbox-item",
@@ -2300,14 +2607,14 @@ function DropdownMenuCheckboxItem({
       checked,
       ...props
     },
-    /* @__PURE__ */ React19.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React19.createElement(import_lucide_react11.CheckIcon, { className: "size-4" }))),
+    /* @__PURE__ */ React21.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React21.createElement(import_lucide_react14.CheckIcon, { className: "size-4" }))),
     children
   );
 }
 function DropdownMenuRadioGroup({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.RadioGroup,
     {
       "data-slot": "dropdown-menu-radio-group",
@@ -2320,7 +2627,7 @@ function DropdownMenuRadioItem({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.RadioItem,
     {
       "data-slot": "dropdown-menu-radio-item",
@@ -2330,7 +2637,7 @@ function DropdownMenuRadioItem({
       ),
       ...props
     },
-    /* @__PURE__ */ React19.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React19.createElement(import_lucide_react11.CircleIcon, { className: "size-2 fill-current" }))),
+    /* @__PURE__ */ React21.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React21.createElement(import_lucide_react14.CircleIcon, { className: "size-2 fill-current" }))),
     children
   );
 }
@@ -2339,7 +2646,7 @@ function DropdownMenuLabel({
   inset,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Label,
     {
       "data-slot": "dropdown-menu-label",
@@ -2356,7 +2663,7 @@ function DropdownMenuSeparator({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Separator,
     {
       "data-slot": "dropdown-menu-separator",
@@ -2369,7 +2676,7 @@ function DropdownMenuShortcut({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     "span",
     {
       "data-slot": "dropdown-menu-shortcut",
@@ -2384,7 +2691,7 @@ function DropdownMenuShortcut({
 function DropdownMenuSub({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Sub, { "data-slot": "dropdown-menu-sub", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Sub, { "data-slot": "dropdown-menu-sub", ...props });
 }
 function DropdownMenuSubTrigger({
   className,
@@ -2392,7 +2699,7 @@ function DropdownMenuSubTrigger({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.SubTrigger,
     {
       "data-slot": "dropdown-menu-sub-trigger",
@@ -2404,14 +2711,14 @@ function DropdownMenuSubTrigger({
       ...props
     },
     children,
-    /* @__PURE__ */ React19.createElement(import_lucide_react11.ChevronRightIcon, { className: "ml-auto size-4" })
+    /* @__PURE__ */ React21.createElement(import_lucide_react14.ChevronRightIcon, { className: "ml-auto size-4" })
   );
 }
 function DropdownMenuSubContent({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.SubContent,
     {
       "data-slot": "dropdown-menu-sub-content",
@@ -2425,9 +2732,9 @@ function DropdownMenuSubContent({
 }
 
 // src/components/ui/input.jsx
-var React20 = __toESM(require("react"));
+var React22 = __toESM(require("react"));
 function Input({ className, type, ...props }) {
-  return /* @__PURE__ */ React20.createElement(
+  return /* @__PURE__ */ React22.createElement(
     "input",
     {
       type,
@@ -2444,7 +2751,7 @@ function Input({ className, type, ...props }) {
 }
 
 // src/components/ui/separator.jsx
-var React21 = __toESM(require("react"));
+var React23 = __toESM(require("react"));
 var SeparatorPrimitive = __toESM(require("@radix-ui/react-separator"));
 function Separator2({
   className,
@@ -2452,7 +2759,7 @@ function Separator2({
   decorative = true,
   ...props
 }) {
-  return /* @__PURE__ */ React21.createElement(
+  return /* @__PURE__ */ React23.createElement(
     SeparatorPrimitive.Root,
     {
       "data-slot": "separator",
@@ -2468,13 +2775,13 @@ function Separator2({
 }
 
 // src/components/ui/tabs.jsx
-var React22 = __toESM(require("react"));
+var React24 = __toESM(require("react"));
 var TabsPrimitive = __toESM(require("@radix-ui/react-tabs"));
 function Tabs({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.Root,
     {
       "data-slot": "tabs",
@@ -2487,7 +2794,7 @@ function TabsList({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.List,
     {
       "data-slot": "tabs-list",
@@ -2503,7 +2810,7 @@ function TabsTrigger({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.Trigger,
     {
       "data-slot": "tabs-trigger",
@@ -2519,7 +2826,7 @@ function TabsContent({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.Content,
     {
       "data-slot": "tabs-content",
@@ -2556,8 +2863,55 @@ var defaultConfig = {
     }
   }
 };
+
+// src/lib/slug-utils.js
+function pathToSlug(path) {
+  return path.replace("documents/", "").replace(".md", "").replace(/&/g, "and").toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-\/]+/g, "").replace(/\-\-+/g, "-").replace(/^-+/, "").replace(/-+$/, "");
+}
+var slugToPathMap = null;
+var pathToSlugMap = null;
+async function initializeSlugMapping(siteConfig) {
+  var _a;
+  const { fetchWorkspaceRegistry: fetchWorkspaceRegistry2 } = await Promise.resolve().then(() => (init_workspace(), workspace_exports));
+  const registry = await fetchWorkspaceRegistry2(siteConfig);
+  if (!registry) {
+    return false;
+  }
+  slugToPathMap = /* @__PURE__ */ new Map();
+  pathToSlugMap = /* @__PURE__ */ new Map();
+  (_a = registry.documents) == null ? void 0 : _a.forEach((doc) => {
+    const slug = pathToSlug(doc.path);
+    slugToPathMap.set(slug, doc.path);
+    pathToSlugMap.set(doc.path, slug);
+  });
+  return true;
+}
+function slugToPath(slug) {
+  if (!slugToPathMap) {
+    console.warn("Slug mapping not initialized, using fallback");
+    return `documents/${slug}.md`;
+  }
+  return slugToPathMap.get(slug) || `documents/${slug}.md`;
+}
+function createSlugMap(documents) {
+  const slugMap = /* @__PURE__ */ new Map();
+  const pathMap = /* @__PURE__ */ new Map();
+  documents.forEach((doc) => {
+    const slug = pathToSlug(doc.path);
+    slugMap.set(slug, doc.path);
+    pathMap.set(doc.path, slug);
+  });
+  return { slugMap, pathMap };
+}
+
+// src/index.js
+init_workspace();
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Button,
   Checkbox,
   ConfigProvider,
@@ -2594,14 +2948,31 @@ var defaultConfig = {
   ScrollArea,
   ScrollBar,
   Separator,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
   TableOfContents,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
   ThemeProvider,
+  buildFileTree,
   buttonVariants,
+  createSlugMap,
   defaultConfig,
+  fetchWorkspaceRegistry,
+  getWorkspaceFileTree,
+  initializeSlugMapping,
+  pathToSlug,
+  slugToPath,
   useConfig
 });
 //# sourceMappingURL=index.js.map

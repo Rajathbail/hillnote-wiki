@@ -1,0 +1,1 @@
+export { DocIndexPage as default } from '@hillnote/wiki/routes'

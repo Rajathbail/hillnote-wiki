@@ -2,6 +2,17 @@
 
 Turn your Hillnote workspace into a beautiful wiki for your Next.js projects. This package provides ready-to-use components for creating documentation sites powered by your Hillnote workspace.
 
+## Features
+
+- 📚 Beautiful documentation UI with navigation sidebar
+- 🎨 Dark/Light theme support
+- 📱 Fully responsive design
+- 🔍 SEO-friendly with sitemap generation
+- 🤖 AI-crawler optimized with structured data
+- 📁 Auto-expanding navigation for active documents
+- 🔗 Smart URL routing with slugs
+- 📝 Markdown rendering with syntax highlighting
+
 ## Installation
 
 ```bash
@@ -12,22 +23,65 @@ yarn add @hillnote/wiki
 pnpm add @hillnote/wiki
 ```
 
+**Note:** All required dependencies (@radix-ui components, gray-matter, etc.) will be automatically installed with the package.
+
 ## Quick Start
 
-### 1. Basic Setup
+### 1. Setup Root Layout with Theme Provider
 
-Create a new page in your Next.js app:
+First, create a providers component and update your root layout:
 
 ```jsx
-// app/wiki/page.jsx
+// app/providers.js
 "use client"
 
-import { Document, Navbar, ThemeProvider, ConfigProvider } from '@hillnote/wiki'
+import { ThemeProvider } from '@hillnote/wiki'
+
+export function Providers({ children }) {
+  return (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      {children}
+    </ThemeProvider>
+  )
+}
+```
+
+```jsx
+// app/layout.js
+import { Providers } from "./providers"
+import "@hillnote/wiki/styles"
+import "./globals.css"
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}
+```
+
+### 2. Create Your Wiki Pages
+
+Create the main wiki page and dynamic routing:
+
+```jsx
+// app/page.js
+"use client"
+
+import { Document, Navbar, ConfigProvider, pathToSlug, initializeSlugMapping } from '@hillnote/wiki'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 const wikiConfig = {
-  siteName: "My Documentation",
-  siteDescription: "Documentation powered by Hillnote",
+  siteName: "My Wiki",
   workspace: {
     path: "/workspace/", // Path to your Hillnote workspace in public folder
     enabled: true,
@@ -36,47 +90,123 @@ const wikiConfig = {
     initialFile: "documents/Start Here.md"
   },
   ui: {
-    showNavigation: true,
-    showTableOfContents: true,
-    showTitleBar: true,
-    showThemeToggle: true
+    authorsNotes: true,
+    navigationText: "All Pages"
   }
 }
 
 export default function WikiPage() {
-  // Prevent hydration errors with theme provider
   const [mounted, setMounted] = useState(false)
-  
+  const router = useRouter()
+
   useEffect(() => {
     setMounted(true)
+    // Initialize slug mapping on mount
+    initializeSlugMapping(wikiConfig)
   }, [])
-  
-  // Don't render on server to avoid hydration mismatch
-  if (!mounted) {
-    return null
+
+  const handleFileSelect = (filePath) => {
+    if (!filePath) return
+    
+    // Convert file path to URL slug
+    const slug = pathToSlug(filePath)
+    
+    router.push(`/doc/${slug}`)
   }
-  
+
+  if (!mounted) return null
+
   return (
     <ConfigProvider config={wikiConfig}>
-      <ThemeProvider>
-        <div className="h-screen flex flex-col">
-          <Navbar 
-          siteName={wikiConfig.siteName}
-          showThemeToggle={true}
-        />
+      <div className="h-screen flex flex-col">
+        <Navbar siteName={wikiConfig.siteName} showThemeToggle={true} />
         <Document 
+          siteConfig={wikiConfig}
           initialFile={wikiConfig.workspace.initialFile}
           showNavigation={true}
           showTableOfContents={true}
+          onFileSelect={handleFileSelect}
         />
-        </div>
-      </ThemeProvider>
+      </div>
     </ConfigProvider>
   )
 }
 ```
 
-### 2. Copy Your Hillnote Workspace
+```jsx
+// app/doc/[...path]/page.js
+"use client"
+
+import { Document, Navbar, ConfigProvider, pathToSlug, slugToPath, initializeSlugMapping } from '@hillnote/wiki'
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+
+const wikiConfig = {
+  siteName: "My Wiki",
+  workspace: {
+    path: "/workspace/",
+    enabled: true,
+    documentsFolder: "documents",
+    registryFile: "documents-registry.json",
+    initialFile: "documents/Start Here.md"
+  },
+  ui: {
+    authorsNotes: true,
+    navigationText: "All Pages"
+  }
+}
+
+export default function DocumentPage() {
+  const params = useParams()
+  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+  const [filePath, setFilePath] = useState(wikiConfig.workspace.initialFile)
+  
+  // Get the slug from URL params
+  const slug = params.path ? params.path.join('/') : null
+
+  useEffect(() => {
+    setMounted(true)
+    // Initialize slug mapping and then set the file path
+    const initAndSetPath = async () => {
+      await initializeSlugMapping(wikiConfig)
+      if (slug) {
+        const path = slugToPath(slug)
+        setFilePath(path)
+      }
+    }
+    initAndSetPath()
+  }, [slug])
+
+  const handleFileSelect = (filePath) => {
+    if (!filePath) return
+    
+    // Convert file path to URL slug
+    const slug = pathToSlug(filePath)
+    
+    router.push(`/doc/${slug}`)
+  }
+
+  if (!mounted) return null
+
+  return (
+    <ConfigProvider config={wikiConfig}>
+      <div className="h-screen flex flex-col">
+        <Navbar siteName={wikiConfig.siteName} showThemeToggle={true} />
+        <Document 
+          siteConfig={wikiConfig}
+          initialFile={filePath}
+          showNavigation={true}
+          showTableOfContents={true}
+          onFileSelect={handleFileSelect}
+        />
+      </div>
+    </ConfigProvider>
+  )
+}
+```
+
+### 3. Copy Your Hillnote Workspace
 
 Copy your Hillnote workspace to your Next.js public folder:
 
@@ -84,16 +214,66 @@ Copy your Hillnote workspace to your Next.js public folder:
 cp -r ~/path-to-hillnote-workspace public/workspace
 ```
 
-### 3. Setup Styles and Tailwind
+### 4. Setup Styles and Tailwind
 
-1. Import the package CSS in your layout:
+1. Update your `globals.css` with theme variables:
 
-```jsx
-// app/layout.jsx
-import "@hillnote/wiki/dist/index.css"
+```css
+/* app/globals.css */
+@import "tailwindcss";
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3.9%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 96.1%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  --accent: 0 0% 96.1%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --ring: 0 0% 3.9%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+  --secondary: 0 0% 14.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --accent: 0 0% 14.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+  --ring: 0 0% 83.1%;
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
 ```
 
-2. Update your `tailwind.config.js` to include the package's content and custom colors:
+2. Create or update your `tailwind.config.js`:
 
 ```js
 // tailwind.config.js
@@ -178,12 +358,11 @@ The main document viewer with navigation sidebar and table of contents.
 import { Document } from '@hillnote/wiki'
 
 <Document 
-  initialFile="documents/index.md"
-  showNavigation={true}
-  showTableOfContents={true}
-  navigationTitle="All Pages"
-  tocTitle="On This Page"
-  onFileSelect={(file) => console.log('Selected:', file)}
+  siteConfig={wikiConfig}           // Pass the entire config object
+  initialFile="documents/index.md"  // Initial file to display
+  showNavigation={true}              // Show navigation sidebar
+  showTableOfContents={true}         // Show table of contents
+  onFileSelect={(file) => console.log('Selected:', file)}  // File selection handler
 />
 ```
 
@@ -202,43 +381,80 @@ import { TableOfContents } from '@hillnote/wiki'
 
 ## Configuration
 
-Create a configuration file for your wiki:
+The configuration object supports the following options:
 
 ```javascript
-// config/wiki.config.js
-
-export const wikiConfig = {
+const wikiConfig = {
   siteName: "My Documentation",
-  siteDescription: "Beautiful docs with Hillnote",
-  
+  workspace: {
+    path: "/workspace/",              // Path to workspace in public folder
+    enabled: true,
+    documentsFolder: "documents",     // Folder containing markdown files
+    registryFile: "documents-registry.json",  // Registry file name
+    initialFile: "documents/Start Here.md"    // Initial document to display
+  },
+  ui: {
+    authorsNotes: true,               // Enable author's notes section
+    navigationText: "All Pages",      // Navigation sidebar title
+    navigationMode: "wiki"            // "emoji" or "wiki" (accordion style)
+  }
+}
+```
+
+### Navigation Modes
+
+The sidebar navigation supports two different display styles. You can switch between them using the `navigationMode` setting in your configuration.
+
+#### 1. Emoji Mode (Default)
+Traditional file explorer style with emoji icons and arrow indicators.
+
+**Features:**
+- 📁 Folder icons for directories
+- 📄 File icons for documents  
+- ▶️ / ▼ Arrow indicators for expand/collapse
+- Visual hierarchy with indentation
+
+```javascript
+const wikiConfig = {
+  ui: {
+    navigationMode: "emoji"  // or omit for default
+  }
+}
+```
+
+#### 2. Wiki Mode
+Clean, modern accordion-style navigation similar to popular documentation sites.
+
+**Features:**
+- Clean text-based navigation
+- Smooth accordion expand/collapse animations
+- No visual clutter from icons
+- Folders stay open when selecting files inside them
+- Auto-expands to show the current document
+
+```javascript
+const wikiConfig = {
+  ui: {
+    navigationMode: "wiki"
+  }
+}
+```
+
+**Complete example with wiki mode:**
+```javascript
+const wikiConfig = {
+  siteName: "My Documentation",
   workspace: {
     path: "/workspace/",
     enabled: true,
     documentsFolder: "documents",
     registryFile: "documents-registry.json",
-    initialFile: "documents/Getting Started.md",
-    customOrder: [
-      "documents/Getting Started.md",
-      "documents/Installation.md",
-      "documents/Configuration.md"
-    ]
+    initialFile: "documents/Start Here.md"
   },
-  
   ui: {
-    showNavigation: true,
-    showTableOfContents: true,
-    showTitleBar: true,
-    showThemeToggle: true,
-    
-    authorsNotes: {
-      enabled: true,
-      title: "Author's Notes"
-    },
-    
-    relatedDocuments: {
-      enabled: true,
-      title: "Related Documents"
-    }
+    authorsNotes: true,
+    navigationText: "All Pages",
+    navigationMode: "wiki"  // Set to "wiki" for accordion style
   }
 }
 ```
@@ -278,24 +494,41 @@ export default function CustomWiki() {
 }
 ```
 
-### Theming
+### URL Routing with Slugs
 
-The package uses Tailwind CSS and supports dark mode out of the box:
+The package includes utilities for converting between file paths and URL-friendly slugs:
 
 ```jsx
-import { ThemeProvider } from '@hillnote/wiki'
+import { pathToSlug, slugToPath, initializeSlugMapping } from '@hillnote/wiki'
 
-export default function App({ children }) {
-  return (
-    <ThemeProvider 
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-    >
-      {children}
-    </ThemeProvider>
-  )
-}
+// Initialize slug mapping (required once on app mount)
+await initializeSlugMapping(wikiConfig)
+
+// Convert file path to URL slug
+const slug = pathToSlug("documents/Getting Started.md")
+// Returns: "getting-started"
+
+// Convert slug back to file path
+const path = slugToPath("getting-started")
+// Returns: "documents/Getting Started.md"
+```
+
+
+### Workspace Utilities
+
+The package exports utilities for working with your Hillnote workspace:
+
+```jsx
+import { buildFileTree, fetchWorkspaceRegistry, getWorkspaceFileTree } from '@hillnote/wiki'
+
+// Fetch the workspace registry
+const registry = await fetchWorkspaceRegistry(wikiConfig)
+
+// Build a hierarchical file tree from the registry
+const fileTree = buildFileTree(registry.documents)
+
+// Get the complete workspace file tree
+const tree = await getWorkspaceFileTree(wikiConfig)
 ```
 
 ## Troubleshooting

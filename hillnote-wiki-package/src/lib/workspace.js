@@ -1,5 +1,5 @@
 // Build a tree structure from flat document and folder lists
-export function buildFileTree(registry, config) {
+export function buildFileTree(registry, siteConfig) {
   const tree = []
   const nodeMap = new Map()
   const orderMap = new Map()
@@ -67,14 +67,10 @@ export function buildFileTree(registry, config) {
   // Sort children based on custom order or registry order
   const sortNodes = (nodes) => {
     nodes.sort((a, b) => {
-      let orderA
-      let orderB
-      
-      // Check if custom order is defined
-      if (config?.workspace?.customOrder && config.workspace.customOrder.length > 0) {
-        // First check custom order
-        const customIndexA = config.workspace.customOrder.indexOf(a.path)
-        const customIndexB = config.workspace.customOrder.indexOf(b.path)
+      // Check if custom order is defined and contains these paths
+      if (siteConfig?.workspace?.customOrder && siteConfig.workspace.customOrder.length > 0) {
+        const customIndexA = siteConfig.workspace.customOrder.indexOf(a.path)
+        const customIndexB = siteConfig.workspace.customOrder.indexOf(b.path)
         
         // If both are in custom order, use that
         if (customIndexA !== -1 && customIndexB !== -1) {
@@ -86,15 +82,11 @@ export function buildFileTree(registry, config) {
         
         // If only B is in custom order, it comes first
         if (customIndexB !== -1) return 1
-        
-        // If neither are in custom order, fall back to registry order
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER
-      } else {
-        // Use registry order if no custom order defined
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER
       }
+      
+      // Always fall back to registry order for items not in customOrder
+      const orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER
+      const orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER
       
       return orderA - orderB // Lower index comes first
     })
@@ -112,13 +104,13 @@ export function buildFileTree(registry, config) {
 }
 
 // Fetch workspace registry from public folder
-export async function fetchWorkspaceRegistry(config) {
-  if (!config?.workspace?.enabled) {
+export async function fetchWorkspaceRegistry(siteConfig) {
+  if (!siteConfig?.workspace?.enabled) {
     return null
   }
   
   try {
-    const registryPath = `${config.workspace.path}${config.workspace.registryFile}`
+    const registryPath = `${siteConfig.workspace.path}${siteConfig.workspace.registryFile}`
     const response = await fetch(registryPath)
     
     if (!response.ok) {
@@ -135,12 +127,12 @@ export async function fetchWorkspaceRegistry(config) {
 }
 
 // Get file tree from workspace
-export async function getWorkspaceFileTree(config) {
-  const registry = await fetchWorkspaceRegistry(config)
+export async function getWorkspaceFileTree(siteConfig) {
+  const registry = await fetchWorkspaceRegistry(siteConfig)
   
   if (!registry) {
     return []
   }
   
-  return buildFileTree(registry, config)
+  return buildFileTree(registry, siteConfig)
 }

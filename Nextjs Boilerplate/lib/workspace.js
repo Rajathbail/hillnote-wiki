@@ -69,12 +69,8 @@ export function buildFileTree(registry) {
   // Sort children based on custom order or registry order
   const sortNodes = (nodes) => {
     nodes.sort((a, b) => {
-      let orderA
-      let orderB
-      
-      // Check if custom order is defined
+      // Check if custom order is defined and contains these paths
       if (siteConfig.workspace.customOrder && siteConfig.workspace.customOrder.length > 0) {
-        // First check custom order
         const customIndexA = siteConfig.workspace.customOrder.indexOf(a.path)
         const customIndexB = siteConfig.workspace.customOrder.indexOf(b.path)
         
@@ -88,15 +84,11 @@ export function buildFileTree(registry) {
         
         // If only B is in custom order, it comes first
         if (customIndexB !== -1) return 1
-        
-        // If neither are in custom order, fall back to registry order
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER
-      } else {
-        // Use registry order if no custom order defined
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER
       }
+      
+      // Always fall back to registry order for items not in customOrder
+      const orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER
+      const orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER
       
       return orderA - orderB // Lower index comes first
     })

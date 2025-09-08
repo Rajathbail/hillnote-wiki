@@ -1,0 +1,1 @@
+export { aiSitemapRoute as GET } from '@hillnote/wiki/routes'

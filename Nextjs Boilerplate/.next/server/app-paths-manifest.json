@@ -1,3 +1,13 @@
 {
-  "/page": "app/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/ai-sitemap/route": "app/api/ai-sitemap/route.js",
+  "/api/documents/route": "app/api/documents/route.js",
+  "/api/document/[...path]/route": "app/api/document/[...path]/route.js",
+  "/sitemap.xml/route": "app/sitemap.xml/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/api/search/route": "app/api/search/route.js",
+  "/robots.txt/route": "app/robots.txt/route.js",
+  "/doc/page": "app/doc/page.js",
+  "/page": "app/page.js",
+  "/doc/[...path]/page": "app/doc/[...path]/page.js"
 }

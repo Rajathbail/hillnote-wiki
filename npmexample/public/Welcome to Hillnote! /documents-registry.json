@@ -1,75 +1,251 @@
 {
   "documents": [
     {
-      "name": "And an empty file",
-      "path": "documents/Folder/And an empty file.md",
+      "name": "Connect with ChatGPT",
+      "path": "documents/Connect/Connect with ChatGPT.md",
       "type": "document",
-      "lastModified": "2025-09-03T17:26:02.201Z",
-      "description": "",
-      "referencedIn": [],
-      "containsReferencesTo": [],
-      "emoji": "🎺"
-    },
-    {
-      "name": "Capabilities",
-      "path": "documents/Capabilities.md",
-      "type": "document",
-      "lastModified": "2025-09-03T17:26:02.201Z",
-      "description": "",
+      "lastModified": "2025-09-08T14:33:33.023Z",
+      "description": "Connect ChatGPT to Hillnote, Google Drive, or GitHub for seamless document referencing and mobile access to enhanced AI conversations.",
       "referencedIn": [
-        "documents/Start here! .md"
+        "documents/Start Here .md"
       ],
       "containsReferencesTo": [],
-      "emoji": "🦈"
+      "position": 0,
+      "emoji": "🎈"
     },
     {
-      "name": "Editing these files",
-      "path": "documents/Editing these files.md",
+      "name": "Start Here ",
+      "path": "documents/Start Here .md",
       "type": "document",
-      "lastModified": "2025-09-03T17:26:02.201Z",
-      "description": "",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote is a local AI note-taking app with built-in LLM support, guiding users through workspace creation, AI tool connections, and file syncing.",
       "referencedIn": [
-        "documents/Start here! .md"
+        "documents/About the Editor.md"
+      ],
+      "containsReferencesTo": [
+        "documents/The Filesystem.md",
+        "documents/About the Editor.md",
+        "documents/AI in Hillnote.md",
+        "documents/Connecting to Hillnote.md",
+        "documents/Make it yours.md",
+        "documents/Connect/Connect with Claude .md",
+        "documents/Connect/Connect with ChatGPT.md",
+        "documents/Connect/Connect with Perplexity.md",
+        "documents/Connect/Use with Grok, Gemini, Deepseek and more.md",
+        "documents/Juuuuuuust the right Tool.md",
+        "documents/Sync/GDrive.md",
+        "documents/Pair with/Pair with Cursor.md",
+        "documents/Pair with/Pair with Github CoPilot.md"
+      ],
+      "position": 0
+    },
+    {
+      "name": "Connect with Claude ",
+      "path": "documents/Connect/Connect with Claude .md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.023Z",
+      "description": "This document outlines how to connect Claude with Hillnote, Google Drive, and Claude Code for seamless workflows and document referencing.",
+      "referencedIn": [
+        "documents/Start Here .md"
       ],
       "containsReferencesTo": [],
+      "position": 1,
+      "emoji": "💥"
+    },
+    {
+      "name": "About the Editor",
+      "path": "documents/About the Editor.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote editor overview: Features include markdown editing, scratch spaces, sidebar navigation, formatting tools, document linking, and source mode for advanced users.",
+      "referencedIn": [
+        "documents/Start Here .md"
+      ],
+      "containsReferencesTo": [
+        "documents/Start Here .md"
+      ],
+      "position": 1,
       "emoji": "🥨"
     },
     {
-      "name": "Setting up the NPM",
-      "path": "documents/Setting up the NPM.md",
+      "name": "Connect with Perplexity",
+      "path": "documents/Connect/Connect with Perplexity.md",
       "type": "document",
-      "lastModified": "2025-09-03T17:26:02.201Z",
-      "description": "",
+      "lastModified": "2025-09-08T14:33:33.023Z",
+      "description": "This document details how to connect Perplexity AI with Hillnote and Google Drive for seamless document referencing and mobile access.",
       "referencedIn": [
-        "documents/Start here! .md"
+        "documents/Start Here .md"
       ],
       "containsReferencesTo": [],
-      "emoji": "🛹"
+      "position": 2,
+      "emoji": "🤺"
     },
     {
-      "name": "Start here! ",
-      "path": "documents/Start here! .md",
+      "name": "The Filesystem",
+      "path": "documents/The Filesystem.md",
       "type": "document",
-      "lastModified": "2025-09-03T17:26:02.201Z",
-      "description": "",
-      "referencedIn": [],
-      "containsReferencesTo": [
-        "documents/Editing these files.md",
-        "documents/Capabilities.md",
-        "documents/Setting up the NPM.md"
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote facilitates AI agent workflows by organizing local files with workspaces, documents, and a registry for context and navigation.",
+      "referencedIn": [
+        "documents/Start Here .md"
       ],
-      "emoji": "🌵"
+      "containsReferencesTo": [],
+      "position": 2,
+      "emoji": "🎳"
+    },
+    {
+      "name": "Use with Grok, Gemini, Deepseek and more",
+      "path": "documents/Connect/Use with Grok, Gemini, Deepseek and more.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.023Z",
+      "description": "Hillnote facilitates persistent document referencing across AI assistants via projects, gems, and cloud integrations.",
+      "referencedIn": [
+        "documents/Start Here .md"
+      ],
+      "containsReferencesTo": [],
+      "position": 3,
+      "emoji": "🥂"
+    },
+    {
+      "name": "Using AI in Hillnote",
+      "path": "documents/Using AI in Hillnote.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote empowers users to utilize AI models for document editing, content generation, and offline assistance via a library interface with tools like spellcheck, prompts, and deep thinking mode.",
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "position": 3,
+      "emoji": "🎾"
+    },
+    {
+      "name": "Pair with Cursor",
+      "path": "documents/Pair with/Pair with Cursor.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.024Z",
+      "description": "This document guides users on integrating Cursor with Hillnote for document management and workflow automation via MCP connection and file syncing.",
+      "referencedIn": [
+        "documents/Start Here .md"
+      ],
+      "containsReferencesTo": [],
+      "position": 4,
+      "emoji": "📮"
+    },
+    {
+      "name": "Make it yours",
+      "path": "documents/Make it yours.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote utilizes local AI models (LLMs) through Ollama, allowing users to experiment with models like Gemma and Llama directly on their computers. Users can configure prompts, add context from documents, and customize settings for optimal AI performance, leveraging GGUF formats for efficient local execution.",
+      "referencedIn": [
+        "documents/Start Here .md"
+      ],
+      "containsReferencesTo": [],
+      "position": 4,
+      "emoji": "🦩"
+    },
+    {
+      "name": "Pair with Github CoPilot",
+      "path": "documents/Pair with/Pair with Github CoPilot.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.024Z",
+      "description": "This document guides users on integrating GitHub Copilot with Hillnote for enhanced project documentation and workflow management.",
+      "referencedIn": [
+        "documents/Start Here .md"
+      ],
+      "containsReferencesTo": [],
+      "position": 5,
+      "emoji": "🏀"
+    },
+    {
+      "name": "Connecting to Hillnote",
+      "path": "documents/Connecting to Hillnote.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote facilitates seamless integration of local and premium AI models with document commenting and a pay-as-you-go credit system.",
+      "referencedIn": [
+        "documents/Start Here .md"
+      ],
+      "containsReferencesTo": [],
+      "position": 5,
+      "emoji": "🗻"
+    },
+    {
+      "name": "GDrive",
+      "path": "documents/Sync & Collaborate/GDrive.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Utilizing Google Drive for file storage, collaboration, and seamless AI assistant connectivity (Claude, ChatGPT, etc.).",
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "position": 6,
+      "emoji": "🧃"
+    },
+    {
+      "name": "Juuuuuuust the right Tool",
+      "path": "documents/Juuuuuuust the right Tool.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote tools are customizable HTML programs created via AI assistants to automate tasks and enhance workflow within the Hillnote workspace.",
+      "referencedIn": [
+        "documents/Start Here .md"
+      ],
+      "containsReferencesTo": [],
+      "position": 6,
+      "emoji": "🪠"
+    },
+    {
+      "name": "Dear MCP and NPM",
+      "path": "documents/Dear MCP and NPM.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnotes MCP server facilitates AI tool connections for seamless note management and document interaction, prioritizing local data privacy.",
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "position": 7,
+      "emoji": "🦁"
+    },
+    {
+      "name": "Get in touch",
+      "path": "documents/Get in touch.md",
+      "type": "document",
+      "lastModified": "2025-09-08T14:33:33.025Z",
+      "description": "Hillnote encourages user feedback and contributions via email, promoting AIs role in future development.",
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "position": 11,
+      "emoji": "🪕"
     }
   ],
   "folders": [
     {
-      "name": "Folder",
-      "path": "documents/Folder",
+      "name": "Connect",
+      "path": "documents/Connect",
+      "type": "folder",
+      "description": "",
+      "documentCount": 4,
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "position": 8
+    },
+    {
+      "name": "Pair with",
+      "path": "documents/Pair with",
+      "type": "folder",
+      "description": "",
+      "documentCount": 2,
+      "referencedIn": [],
+      "containsReferencesTo": [],
+      "position": 9
+    },
+    {
+      "name": "Sync & Collaborate",
+      "path": "documents/Sync & Collaborate",
       "type": "folder",
       "description": "",
       "documentCount": 1,
       "referencedIn": [],
-      "containsReferencesTo": []
+      "containsReferencesTo": [],
+      "position": 10
     }
   ]
 }

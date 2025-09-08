@@ -1,3 +1,15 @@
+import {
+  createSlugMap,
+  initializeSlugMapping,
+  pathToSlug,
+  slugToPath
+} from "./chunk-GANLFL5H.mjs";
+import {
+  buildFileTree,
+  fetchWorkspaceRegistry,
+  getWorkspaceFileTree
+} from "./chunk-NOCHJRA2.mjs";
+
 // src/components/wiki/Navbar.jsx
 import React3 from "react";
 
@@ -87,18 +99,20 @@ var Navbar = ({
   className = "",
   children
 }) => {
-  return /* @__PURE__ */ React3.createElement("header", { className: `h-16 bg-background flex items-center justify-between px-8 pt-8 pb-4 ${className}` }, showSiteName && /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement("span", { className: "font-semibold text-lg" }, siteName)), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-4" }, children, showThemeToggle && /* @__PURE__ */ React3.createElement(ThemeToggle, null)));
+  return /* @__PURE__ */ React3.createElement("header", { className: `h-16 bg-background flex items-center justify-between px-4 md:px-8 pt-8 pb-4 ${className}` }, showSiteName && /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement("span", { className: "font-semibold text-lg" }, siteName)), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-4" }, children, showThemeToggle && /* @__PURE__ */ React3.createElement(ThemeToggle, null)));
 };
 
 // src/components/wiki/Document.jsx
-import React15, { useState as useState6, useEffect as useEffect4 } from "react";
+import React17, { useState as useState6, useEffect as useEffect4 } from "react";
 
 // src/components/navigation-sidebar.jsx
 import React6, { useState, useEffect } from "react";
 import {
-  ChevronDown,
+  ChevronDown as ChevronDown2,
   ChevronRight,
-  Loader2
+  Loader2,
+  BookOpen,
+  Sparkles
 } from "lucide-react";
 
 // src/components/ui/scroll-area.jsx
@@ -156,135 +170,115 @@ function ScrollBar({
   );
 }
 
-// src/lib/workspace.js
-function buildFileTree(registry, config) {
-  var _a, _b, _c, _d;
-  const tree = [];
-  const nodeMap = /* @__PURE__ */ new Map();
-  const orderMap = /* @__PURE__ */ new Map();
-  (_a = registry.documents) == null ? void 0 : _a.forEach((doc, index) => {
-    orderMap.set(doc.path, index);
-  });
-  (_b = registry.folders) == null ? void 0 : _b.forEach((folder, index) => {
-    var _a2;
-    orderMap.set(folder.path, index + (((_a2 = registry.documents) == null ? void 0 : _a2.length) || 0));
-  });
-  (_c = registry.folders) == null ? void 0 : _c.forEach((folder) => {
-    const pathParts = folder.path.split("/");
-    const folderName = pathParts[pathParts.length - 1];
-    const node = {
-      id: folder.path,
-      name: folderName,
-      type: "directory",
-      path: folder.path,
-      emoji: folder.emoji || "\u{1F4C1}",
-      children: []
-    };
-    nodeMap.set(folder.path, node);
-  });
-  (_d = registry.documents) == null ? void 0 : _d.forEach((doc) => {
-    const pathParts = doc.path.split("/");
-    const fileName = pathParts[pathParts.length - 1];
-    const node = {
-      id: doc.path,
-      name: fileName,
-      type: "file",
-      path: doc.path,
-      emoji: doc.emoji || "\u{1F335}"
-    };
-    nodeMap.set(doc.path, node);
-  });
-  nodeMap.forEach((node, path) => {
-    const pathParts = path.split("/");
-    if (pathParts.length === 2) {
-      tree.push(node);
-    } else if (pathParts.length > 2) {
-      const parentPath = pathParts.slice(0, -1).join("/");
-      const parent = nodeMap.get(parentPath);
-      if (parent && parent.children) {
-        parent.children.push(node);
-      } else {
-        tree.push(node);
-      }
-    }
-  });
-  const sortNodes = (nodes) => {
-    nodes.sort((a, b) => {
-      var _a2;
-      let orderA;
-      let orderB;
-      if (((_a2 = config == null ? void 0 : config.workspace) == null ? void 0 : _a2.customOrder) && config.workspace.customOrder.length > 0) {
-        const customIndexA = config.workspace.customOrder.indexOf(a.path);
-        const customIndexB = config.workspace.customOrder.indexOf(b.path);
-        if (customIndexA !== -1 && customIndexB !== -1) {
-          return customIndexA - customIndexB;
-        }
-        if (customIndexA !== -1) return -1;
-        if (customIndexB !== -1) return 1;
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER;
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER;
-      } else {
-        orderA = orderMap.get(a.path) ?? Number.MAX_SAFE_INTEGER;
-        orderB = orderMap.get(b.path) ?? Number.MAX_SAFE_INTEGER;
-      }
-      return orderA - orderB;
-    });
-    nodes.forEach((node) => {
-      if (node.children && node.children.length > 0) {
-        sortNodes(node.children);
-      }
-    });
-  };
-  sortNodes(tree);
-  return tree;
-}
-async function fetchWorkspaceRegistry(config) {
-  var _a;
-  if (!((_a = config == null ? void 0 : config.workspace) == null ? void 0 : _a.enabled)) {
-    return null;
+// src/components/ui/accordion.jsx
+import * as React5 from "react";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { ChevronDown } from "lucide-react";
+var Accordion = AccordionPrimitive.Root;
+var AccordionItem = React5.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React5.createElement(
+  AccordionPrimitive.Item,
+  {
+    ref,
+    className: cn("", className),
+    ...props
   }
-  try {
-    const registryPath = `${config.workspace.path}${config.workspace.registryFile}`;
-    const response = await fetch(registryPath);
-    if (!response.ok) {
-      console.error("Failed to fetch workspace registry:", response.statusText);
-      return null;
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error loading workspace registry:", error);
-    return null;
-  }
-}
-async function getWorkspaceFileTree(config) {
-  const registry = await fetchWorkspaceRegistry(config);
-  if (!registry) {
-    return [];
-  }
-  return buildFileTree(registry, config);
-}
-
-// src/components/ConfigProvider.jsx
-import React5, { createContext, useContext } from "react";
-var ConfigContext = createContext(null);
-function ConfigProvider({ children, config }) {
-  return /* @__PURE__ */ React5.createElement(ConfigContext.Provider, { value: config }, children);
-}
-function useConfig() {
-  const config = useContext(ConfigContext);
-  if (!config) {
-    throw new Error("useConfig must be used within a ConfigProvider");
-  }
-  return config;
-}
+));
+AccordionItem.displayName = "AccordionItem";
+var AccordionTrigger = React5.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ React5.createElement(AccordionPrimitive.Header, { className: "flex" }, /* @__PURE__ */ React5.createElement(
+  AccordionPrimitive.Trigger,
+  {
+    ref,
+    className: cn(
+      "flex flex-1 items-center justify-between py-2 font-medium transition-all [&[data-state=open]>svg]:rotate-180",
+      className
+    ),
+    ...props
+  },
+  children,
+  /* @__PURE__ */ React5.createElement(ChevronDown, { className: "h-4 w-4 shrink-0 transition-transform duration-200" })
+)));
+AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
+var AccordionContent = React5.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ React5.createElement(
+  AccordionPrimitive.Content,
+  {
+    ref,
+    className: "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+    ...props
+  },
+  /* @__PURE__ */ React5.createElement("div", { className: cn("pb-4 pt-0", className) }, children)
+));
+AccordionContent.displayName = AccordionPrimitive.Content.displayName;
 
 // src/components/navigation-sidebar.jsx
-var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
+var folderContainsActiveFile = (node, currentFile) => {
+  if (!node.children || !currentFile) return false;
+  return node.children.some((child) => {
+    if (child.id === currentFile) return true;
+    if (child.children) return folderContainsActiveFile(child, currentFile);
+    return false;
+  });
+};
+var WikiTreeNode = ({ node, currentFile, onFileSelect, parentPath = "", openItems, setOpenItems }) => {
   var _a;
-  const [isExpanded, setIsExpanded] = useState(false);
   const isActive = currentFile === node.id;
   const hasChildren = node.children && node.children.length > 0;
+  const accordionValue = parentPath ? `${parentPath}-${node.id}` : node.id;
+  if (node.type === "file") {
+    return /* @__PURE__ */ React6.createElement(
+      "button",
+      {
+        className: cn(
+          "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors w-full text-left",
+          isActive ? "bg-accent font-semibold" : "hover:bg-accent/50"
+        ),
+        onClick: () => onFileSelect(node.id)
+      },
+      /* @__PURE__ */ React6.createElement("span", { className: "break-words" }, node.name.endsWith(".md") ? node.name.replace(/\.md$/, "") : node.name)
+    );
+  }
+  if (!hasChildren) {
+    return /* @__PURE__ */ React6.createElement("div", { className: "px-3 py-1.5 text-sm text-muted-foreground" }, node.name);
+  }
+  return /* @__PURE__ */ React6.createElement(
+    Accordion,
+    {
+      type: "single",
+      collapsible: true,
+      className: "w-full",
+      value: openItems.includes(accordionValue) ? accordionValue : "",
+      onValueChange: (value) => {
+        if (value) {
+          setOpenItems((prev) => [...prev.filter((item) => item !== accordionValue), accordionValue]);
+        } else {
+          setOpenItems((prev) => prev.filter((item) => item !== accordionValue));
+        }
+      }
+    },
+    /* @__PURE__ */ React6.createElement(AccordionItem, { value: accordionValue, className: "border-b-0" }, /* @__PURE__ */ React6.createElement(AccordionTrigger, { className: "px-3 py-2 text-sm hover:no-underline hover:bg-accent/50 rounded-md" }, node.name), /* @__PURE__ */ React6.createElement(AccordionContent, { className: "pl-3" }, /* @__PURE__ */ React6.createElement("div", { className: "flex flex-col space-y-1" }, (_a = node.children) == null ? void 0 : _a.map((child) => /* @__PURE__ */ React6.createElement(
+      WikiTreeNode,
+      {
+        key: child.id,
+        node: child,
+        currentFile,
+        onFileSelect,
+        parentPath: accordionValue,
+        openItems,
+        setOpenItems
+      }
+    )))))
+  );
+};
+var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect, mode = "emoji" }) => {
+  var _a;
+  const shouldBeOpen = folderContainsActiveFile(node, currentFile);
+  const [isExpanded, setIsExpanded] = useState(shouldBeOpen);
+  const isActive = currentFile === node.id;
+  const hasChildren = node.children && node.children.length > 0;
+  useEffect(() => {
+    if (shouldBeOpen) {
+      setIsExpanded(true);
+    }
+  }, [shouldBeOpen, currentFile]);
   const handleClick = () => {
     if (node.type === "file") {
       onFileSelect(node.id);
@@ -302,8 +296,8 @@ var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
       onClick: handleClick,
       style: { paddingLeft: `${level * 8 + 8}px` }
     },
-    node.type === "directory" && /* @__PURE__ */ React6.createElement("span", { className: "transition-transform" }, isExpanded ? /* @__PURE__ */ React6.createElement(ChevronDown, { className: "h-3 w-3" }) : /* @__PURE__ */ React6.createElement(ChevronRight, { className: "h-3 w-3" })),
-    node.type === "directory" ? isExpanded ? /* @__PURE__ */ React6.createElement("span", { className: "text-md" }, "\u{1F4C1}") : /* @__PURE__ */ React6.createElement("span", { className: "text-md" }, "\u{1F4C2}") : /* @__PURE__ */ React6.createElement("span", { className: "text-xs ml-5 shrink-0" }, node.emoji || "\u{1F335}"),
+    mode === "emoji" && /* @__PURE__ */ React6.createElement(React6.Fragment, null, node.type === "directory" && /* @__PURE__ */ React6.createElement("span", { className: "transition-transform" }, isExpanded ? /* @__PURE__ */ React6.createElement(ChevronDown2, { className: "h-3 w-3" }) : /* @__PURE__ */ React6.createElement(ChevronRight, { className: "h-3 w-3" })), node.type === "directory" ? isExpanded ? /* @__PURE__ */ React6.createElement("span", { className: "text-md" }, "\u{1F4C1}") : /* @__PURE__ */ React6.createElement("span", { className: "text-md" }, "\u{1F4C2}") : /* @__PURE__ */ React6.createElement("span", { className: "text-xs ml-5 shrink-0" }, node.emoji || "\u{1F335}")),
+    mode === "wiki" && node.type === "directory" && /* @__PURE__ */ React6.createElement("span", { className: "transition-transform" }, isExpanded ? /* @__PURE__ */ React6.createElement(ChevronDown2, { className: "h-3 w-3" }) : /* @__PURE__ */ React6.createElement(ChevronRight, { className: "h-3 w-3" })),
     /* @__PURE__ */ React6.createElement("span", { className: "truncate" }, node.type === "file" && node.name.endsWith(".md") ? node.name.replace(/\.md$/, "") : node.name)
   )), isExpanded && hasChildren && /* @__PURE__ */ React6.createElement("div", { className: "relative" }, (_a = node.children) == null ? void 0 : _a.map((child) => /* @__PURE__ */ React6.createElement(
     TreeNodeComponent,
@@ -312,7 +306,8 @@ var TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
       node: child,
       level: level + 1,
       currentFile,
-      onFileSelect
+      onFileSelect,
+      mode
     }
   ))));
 };
@@ -320,30 +315,61 @@ function NavigationSidebar({
   showTitle = true,
   title = "All Pages",
   onFileSelect,
-  selectedFile
+  selectedFile,
+  siteConfig
 } = {}) {
-  const config = useConfig();
+  var _a;
   const [currentFile, setCurrentFile] = useState(selectedFile || null);
   const [fileTree, setFileTree] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [navigationMode, setNavigationMode] = useState(((_a = siteConfig == null ? void 0 : siteConfig.ui) == null ? void 0 : _a.navigationMode) || "emoji");
+  const [openAccordionItems, setOpenAccordionItems] = useState([]);
   useEffect(() => {
     setCurrentFile(selectedFile || null);
   }, [selectedFile]);
   useEffect(() => {
+    if (navigationMode === "wiki" && currentFile && fileTree.length > 0) {
+      const findPathToFile = (nodes, targetId, currentPath = []) => {
+        for (const node of nodes) {
+          if (node.id === targetId) {
+            return currentPath;
+          }
+          if (node.children) {
+            const path = findPathToFile(node.children, targetId, [...currentPath, currentPath.length > 0 ? `${currentPath[currentPath.length - 1]}-${node.id}` : node.id]);
+            if (path) return path;
+          }
+        }
+        return null;
+      };
+      const pathToOpen = findPathToFile(fileTree, currentFile);
+      if (pathToOpen) {
+        setOpenAccordionItems((prev) => {
+          const newItems = [...prev];
+          pathToOpen.forEach((item) => {
+            if (!newItems.includes(item)) {
+              newItems.push(item);
+            }
+          });
+          return newItems;
+        });
+      }
+    }
+  }, [currentFile, fileTree, navigationMode]);
+  useEffect(() => {
     const loadWorkspace = async () => {
-      var _a;
+      var _a2, _b;
       try {
         setIsLoading(true);
         setError(null);
-        if ((_a = config == null ? void 0 : config.workspace) == null ? void 0 : _a.enabled) {
-          const tree = await getWorkspaceFileTree(config);
+        if ((_a2 = siteConfig == null ? void 0 : siteConfig.workspace) == null ? void 0 : _a2.enabled) {
+          const tree = await getWorkspaceFileTree(siteConfig);
           setFileTree(tree);
           if (tree.length === 0) {
             setError("No documents found in workspace");
           } else {
-            if (config.workspace.initialFile && !currentFile) {
-              const initialFile = config.workspace.initialFile;
+            if (((_b = siteConfig == null ? void 0 : siteConfig.workspace) == null ? void 0 : _b.initialFile) && !currentFile) {
+              const initialFile = siteConfig.workspace.initialFile;
               setCurrentFile(initialFile);
               if (onFileSelect) {
                 onFileSelect(initialFile);
@@ -375,7 +401,22 @@ function NavigationSidebar({
     };
     loadWorkspace();
   }, []);
-  return /* @__PURE__ */ React6.createElement("div", { className: "h-full p-3" }, /* @__PURE__ */ React6.createElement("div", { className: "h-full flex flex-col overflow-hidden" }, showTitle && /* @__PURE__ */ React6.createElement("div", { className: "px-3 pt-6" }, /* @__PURE__ */ React6.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ React6.createElement(ScrollArea, { className: "mt-4 flex-1 px-2 py-2" }, /* @__PURE__ */ React6.createElement("div", { className: "flex flex-col space-y-1" }, isLoading ? /* @__PURE__ */ React6.createElement("div", { className: "flex items-center justify-center py-8" }, /* @__PURE__ */ React6.createElement(Loader2, { className: "h-6 w-6 animate-spin text-muted-foreground" })) : error ? /* @__PURE__ */ React6.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, error) : fileTree.length === 0 ? /* @__PURE__ */ React6.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, "No documents found") : fileTree.map((node) => /* @__PURE__ */ React6.createElement(
+  return /* @__PURE__ */ React6.createElement("div", { className: "h-full flex flex-col p-3" }, showTitle && /* @__PURE__ */ React6.createElement("div", { className: "px-3 pt-6 pb-4" }, /* @__PURE__ */ React6.createElement("h3", { className: "text-xs text-primary/40 font-semibold" }, title)), /* @__PURE__ */ React6.createElement("div", { className: "flex-1 min-h-0" }, /* @__PURE__ */ React6.createElement(ScrollArea, { className: "h-full px-2 py-2" }, /* @__PURE__ */ React6.createElement("div", { className: "flex flex-col space-y-1" }, isLoading ? /* @__PURE__ */ React6.createElement("div", { className: "flex items-center justify-center py-8" }, /* @__PURE__ */ React6.createElement(Loader2, { className: "h-6 w-6 animate-spin text-muted-foreground" })) : error ? /* @__PURE__ */ React6.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, error) : fileTree.length === 0 ? /* @__PURE__ */ React6.createElement("div", { className: "text-xs text-muted-foreground text-center py-4" }, "No documents found") : navigationMode === "wiki" ? fileTree.map((node) => /* @__PURE__ */ React6.createElement(
+    WikiTreeNode,
+    {
+      key: node.id,
+      node,
+      currentFile,
+      onFileSelect: (id) => {
+        setCurrentFile(id);
+        if (onFileSelect) {
+          onFileSelect(id);
+        }
+      },
+      openItems: openAccordionItems,
+      setOpenItems: setOpenAccordionItems
+    }
+  )) : fileTree.map((node) => /* @__PURE__ */ React6.createElement(
     TreeNodeComponent,
     {
       key: node.id,
@@ -387,14 +428,15 @@ function NavigationSidebar({
         if (onFileSelect) {
           onFileSelect(id);
         }
-      }
+      },
+      mode: navigationMode
     }
   ))))));
 }
 
 // src/components/table-of-contents.jsx
 import React7, { useState as useState2, useEffect as useEffect2 } from "react";
-import { ChevronRight as ChevronRight2, ChevronDown as ChevronDown2 } from "lucide-react";
+import { ChevronRight as ChevronRight2, ChevronDown as ChevronDown3 } from "lucide-react";
 function TableOfContents({
   showTitle = true,
   title = "On This Page",
@@ -592,7 +634,7 @@ function TableOfContents({
         onClick: (e) => toggleCollapse(e, item.id),
         className: "p-0.5 hover:bg-accent/50 rounded mr-1"
       },
-      isCollapsed ? /* @__PURE__ */ React7.createElement(ChevronRight2, { className: "h-3 w-3" }) : /* @__PURE__ */ React7.createElement(ChevronDown2, { className: "h-3 w-3" })
+      isCollapsed ? /* @__PURE__ */ React7.createElement(ChevronRight2, { className: "h-3 w-3" }) : /* @__PURE__ */ React7.createElement(ChevronDown3, { className: "h-3 w-3" })
     ), /* @__PURE__ */ React7.createElement(
       "button",
       {
@@ -618,7 +660,7 @@ function TableOfContents({
 }
 
 // src/components/markdown-renderer.jsx
-import React14, { useEffect as useEffect3, useState as useState5, useRef } from "react";
+import React15, { useEffect as useEffect3, useState as useState5, useRef } from "react";
 import { marked } from "marked";
 import { gfmHeadingId } from "marked-gfm-heading-id";
 import { Layers2, Loader2 as Loader22 } from "lucide-react";
@@ -653,7 +695,7 @@ function Checkbox({
 }
 
 // src/components/document-footer.jsx
-import React11, { useState as useState3 } from "react";
+import React12, { useState as useState3 } from "react";
 
 // src/components/authors-notes.jsx
 import React9 from "react";
@@ -701,6 +743,20 @@ function RelatedDocuments({ documents, onDocumentClick }) {
   )));
 }
 
+// src/components/ConfigProvider.jsx
+import React11, { createContext, useContext } from "react";
+var ConfigContext = createContext(null);
+function ConfigProvider({ children, config }) {
+  return /* @__PURE__ */ React11.createElement(ConfigContext.Provider, { value: config }, children);
+}
+function useConfig() {
+  const config = useContext(ConfigContext);
+  if (!config) {
+    throw new Error("useConfig must be used within a ConfigProvider");
+  }
+  return config;
+}
+
 // src/components/document-footer.jsx
 function DocumentFooter({ comments, relatedDocuments, onDocumentClick }) {
   var _a, _b, _c, _d;
@@ -712,12 +768,12 @@ function DocumentFooter({ comments, relatedDocuments, onDocumentClick }) {
     return null;
   }
   if (showAuthorsNotes && !showRelated) {
-    return /* @__PURE__ */ React11.createElement("div", { className: "mt-12 pt-8" }, /* @__PURE__ */ React11.createElement("h2", { className: "text-lg font-semibold mb-6" }, ((_c = config.ui.authorsNotes) == null ? void 0 : _c.title) || "Author's Notes"), /* @__PURE__ */ React11.createElement(AuthorsNotes, { comments }));
+    return /* @__PURE__ */ React12.createElement("div", { className: "mt-12 pt-8" }, /* @__PURE__ */ React12.createElement("h2", { className: "text-lg font-semibold mb-6" }, ((_c = config.ui.authorsNotes) == null ? void 0 : _c.title) || "Author's Notes"), /* @__PURE__ */ React12.createElement(AuthorsNotes, { comments }));
   }
   if (showRelated && !showAuthorsNotes) {
-    return /* @__PURE__ */ React11.createElement("div", { className: "mt-12 pt-8" }, /* @__PURE__ */ React11.createElement("h2", { className: "text-lg font-semibold mb-6" }, ((_d = config.ui.relatedDocuments) == null ? void 0 : _d.title) || "Related Documents"), /* @__PURE__ */ React11.createElement(RelatedDocuments, { documents: relatedDocuments, onDocumentClick }));
+    return /* @__PURE__ */ React12.createElement("div", { className: "mt-12 pt-8" }, /* @__PURE__ */ React12.createElement("h2", { className: "text-lg font-semibold mb-6" }, ((_d = config.ui.relatedDocuments) == null ? void 0 : _d.title) || "Related Documents"), /* @__PURE__ */ React12.createElement(RelatedDocuments, { documents: relatedDocuments, onDocumentClick }));
   }
-  return /* @__PURE__ */ React11.createElement("div", { className: "mt-12 pt-8" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center gap-8 mb-8 border-b border-border" }, /* @__PURE__ */ React11.createElement(
+  return /* @__PURE__ */ React12.createElement("div", { className: "mt-12 pt-8" }, /* @__PURE__ */ React12.createElement("div", { className: "flex items-center gap-8 mb-8 border-b border-border" }, /* @__PURE__ */ React12.createElement(
     "button",
     {
       onClick: () => setActiveTab("related"),
@@ -726,9 +782,9 @@ function DocumentFooter({ comments, relatedDocuments, onDocumentClick }) {
         activeTab === "related" ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
       )
     },
-    /* @__PURE__ */ React11.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React11.createElement("span", null, "Related Documents"), /* @__PURE__ */ React11.createElement("span", { className: "text-xs text-muted-foreground ml-1" }, "(", relatedDocuments.length, ")")),
-    activeTab === "related" && /* @__PURE__ */ React11.createElement("div", { className: "absolute bottom-0 left-0 right-0 h-0.5 bg-primary" })
-  ), /* @__PURE__ */ React11.createElement(
+    /* @__PURE__ */ React12.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React12.createElement("span", null, "Related Documents"), /* @__PURE__ */ React12.createElement("span", { className: "text-xs text-muted-foreground ml-1" }, "(", relatedDocuments.length, ")")),
+    activeTab === "related" && /* @__PURE__ */ React12.createElement("div", { className: "absolute bottom-0 left-0 right-0 h-0.5 bg-primary" })
+  ), /* @__PURE__ */ React12.createElement(
     "button",
     {
       onClick: () => setActiveTab("comments"),
@@ -737,25 +793,25 @@ function DocumentFooter({ comments, relatedDocuments, onDocumentClick }) {
         activeTab === "comments" ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
       )
     },
-    /* @__PURE__ */ React11.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React11.createElement("span", null, "Notes"), /* @__PURE__ */ React11.createElement("span", { className: "text-xs text-muted-foreground ml-1" }, "(", comments.length, ")")),
-    activeTab === "comments" && /* @__PURE__ */ React11.createElement("div", { className: "absolute bottom-0 left-0 right-0 h-0.5 bg-primary" })
-  )), /* @__PURE__ */ React11.createElement("div", { className: "mt-2" }, activeTab === "related" && /* @__PURE__ */ React11.createElement(
+    /* @__PURE__ */ React12.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React12.createElement("span", null, "Notes"), /* @__PURE__ */ React12.createElement("span", { className: "text-xs text-muted-foreground ml-1" }, "(", comments.length, ")")),
+    activeTab === "comments" && /* @__PURE__ */ React12.createElement("div", { className: "absolute bottom-0 left-0 right-0 h-0.5 bg-primary" })
+  )), /* @__PURE__ */ React12.createElement("div", { className: "mt-2" }, activeTab === "related" && /* @__PURE__ */ React12.createElement(
     RelatedDocuments,
     {
       documents: relatedDocuments,
       onDocumentClick
     }
-  ), activeTab === "comments" && /* @__PURE__ */ React11.createElement(AuthorsNotes, { comments })));
+  ), activeTab === "comments" && /* @__PURE__ */ React12.createElement(AuthorsNotes, { comments })));
 }
 
 // src/components/scratchspace.jsx
-import React12, { useState as useState4 } from "react";
-import { ChevronDown as ChevronDown3, ChevronRight as ChevronRight3, Copy, Sparkles, AlertTriangle, Users } from "lucide-react";
+import React13, { useState as useState4 } from "react";
+import { ChevronDown as ChevronDown4, ChevronRight as ChevronRight3, Copy, Sparkles as Sparkles2, AlertTriangle, Users } from "lucide-react";
 function ScratchSpace({ title, variant = "default", content, collapsed: initialCollapsed = true }) {
   const [isCollapsed, setIsCollapsed] = useState4(initialCollapsed);
   const variantConfig = {
     "ai-response": {
-      icon: /* @__PURE__ */ React12.createElement(Sparkles, { size: 14, className: "sparkle-icon text-purple-500 dark:text-purple-400" }),
+      icon: /* @__PURE__ */ React13.createElement(Sparkles2, { size: 14, className: "sparkle-icon text-purple-500 dark:text-purple-400" }),
       borderClass: "border-purple-300 dark:border-purple-700",
       bgClass: "bg-purple-50/30 dark:bg-purple-900/10",
       shadowClass: "shadow-[0_0_15px_rgba(147,51,234,0.1)] dark:shadow-[0_0_15px_rgba(147,51,234,0.15)]",
@@ -765,7 +821,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
       defaultTitle: "AI Response"
     },
     "conflict": {
-      icon: /* @__PURE__ */ React12.createElement(AlertTriangle, { size: 14, className: "text-orange-500 dark:text-orange-400" }),
+      icon: /* @__PURE__ */ React13.createElement(AlertTriangle, { size: 14, className: "text-orange-500 dark:text-orange-400" }),
       borderClass: "border-orange-300 dark:border-orange-700",
       bgClass: "bg-orange-50/30 dark:bg-orange-900/10",
       shadowClass: "shadow-[0_0_15px_rgba(255,165,0,0.1)] dark:shadow-[0_0_15px_rgba(255,165,0,0.15)]",
@@ -775,7 +831,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
       defaultTitle: "Merge Conflict"
     },
     "conflict-version": {
-      icon: /* @__PURE__ */ React12.createElement(Users, { size: 14, className: "text-yellow-600 dark:text-yellow-400" }),
+      icon: /* @__PURE__ */ React13.createElement(Users, { size: 14, className: "text-yellow-600 dark:text-yellow-400" }),
       borderClass: "border-yellow-300 dark:border-yellow-700",
       bgClass: "bg-yellow-50/30 dark:bg-yellow-900/10",
       shadowClass: "shadow-[0_0_10px_rgba(255,255,0,0.1)]",
@@ -807,7 +863,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
       console.error("Failed to copy:", err);
     });
   };
-  return /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ React13.createElement(
     "div",
     {
       className: cn(
@@ -822,7 +878,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
       "data-expanded": !isCollapsed,
       "data-variant": variant
     },
-    /* @__PURE__ */ React12.createElement(
+    /* @__PURE__ */ React13.createElement(
       "div",
       {
         className: cn(
@@ -833,7 +889,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
         ),
         onClick: () => setIsCollapsed(!isCollapsed)
       },
-      /* @__PURE__ */ React12.createElement("div", { className: "flex-1 flex items-center min-w-0" }, /* @__PURE__ */ React12.createElement(
+      /* @__PURE__ */ React13.createElement("div", { className: "flex-1 flex items-center min-w-0" }, /* @__PURE__ */ React13.createElement(
         "span",
         {
           className: cn(
@@ -846,20 +902,20 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
             setIsCollapsed(!isCollapsed);
           }
         },
-        isCollapsed ? /* @__PURE__ */ React12.createElement(ChevronRight3, { size: 16 }) : /* @__PURE__ */ React12.createElement(ChevronDown3, { size: 16 })
-      ), variant === "ai-response" ? /* @__PURE__ */ React12.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React12.createElement("span", { className: "flex items-center gap-1.5 cursor-pointer font-medium truncate" }, config.icon, /* @__PURE__ */ React12.createElement("span", { className: cn(
+        isCollapsed ? /* @__PURE__ */ React13.createElement(ChevronRight3, { size: 16 }) : /* @__PURE__ */ React13.createElement(ChevronDown4, { size: 16 })
+      ), variant === "ai-response" ? /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement("span", { className: "flex items-center gap-1.5 cursor-pointer font-medium truncate" }, config.icon, /* @__PURE__ */ React13.createElement("span", { className: cn(
         "truncate",
         isCollapsed && "text-muted-foreground",
         !isCollapsed && config.textColorClass
-      ) }, displayTitle))) : variant === "conflict" ? /* @__PURE__ */ React12.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React12.createElement("span", { className: "flex items-center gap-1.5 cursor-pointer font-medium truncate" }, config.icon, /* @__PURE__ */ React12.createElement("span", { className: cn(
+      ) }, displayTitle))) : variant === "conflict" ? /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement("span", { className: "flex items-center gap-1.5 cursor-pointer font-medium truncate" }, config.icon, /* @__PURE__ */ React13.createElement("span", { className: cn(
         "truncate",
         isCollapsed && "text-muted-foreground",
         !isCollapsed && config.textColorClass
-      ) }, displayTitle))) : variant === "conflict-version" ? /* @__PURE__ */ React12.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React12.createElement("span", { className: "flex items-center gap-1.5 cursor-pointer font-medium truncate" }, config.icon, /* @__PURE__ */ React12.createElement("span", { className: cn(
+      ) }, displayTitle))) : variant === "conflict-version" ? /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement("span", { className: "flex items-center gap-1.5 cursor-pointer font-medium truncate" }, config.icon, /* @__PURE__ */ React13.createElement("span", { className: cn(
         "truncate",
         isCollapsed && "text-muted-foreground",
         !isCollapsed && config.textColorClass
-      ) }, displayTitle))) : displayTitle && /* @__PURE__ */ React12.createElement(
+      ) }, displayTitle))) : displayTitle && /* @__PURE__ */ React13.createElement(
         "span",
         {
           className: cn(
@@ -868,11 +924,11 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
           )
         },
         displayTitle
-      ), isCollapsed && /* @__PURE__ */ React12.createElement("div", { className: cn(
+      ), isCollapsed && /* @__PURE__ */ React13.createElement("div", { className: cn(
         "flex-1 h-[1px] bg-border/50 mx-2",
         variant === "ai-response" && "bg-purple-200/50 dark:bg-purple-700/30"
       ) })),
-      /* @__PURE__ */ React12.createElement("div", { className: "flex items-center space-x-1" }, /* @__PURE__ */ React12.createElement(
+      /* @__PURE__ */ React13.createElement("div", { className: "flex items-center space-x-1" }, /* @__PURE__ */ React13.createElement(
         Button,
         {
           variant: "ghost",
@@ -887,10 +943,10 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
             handleCopy();
           }
         },
-        /* @__PURE__ */ React12.createElement(Copy, { size: 14 })
+        /* @__PURE__ */ React13.createElement(Copy, { size: 14 })
       ))
     ),
-    /* @__PURE__ */ React12.createElement(
+    /* @__PURE__ */ React13.createElement(
       "div",
       {
         className: cn(
@@ -909,10 +965,10 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
           transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)"
         }
       },
-      /* @__PURE__ */ React12.createElement("div", { className: cn(
+      /* @__PURE__ */ React13.createElement("div", { className: cn(
         "prose dark:prose-invert",
         variant === "ai-response" && "prose-purple dark:prose-purple"
-      ) }, /* @__PURE__ */ React12.createElement(
+      ) }, /* @__PURE__ */ React13.createElement(
         "div",
         {
           className: "content",
@@ -924,7 +980,7 @@ function ScratchSpace({ title, variant = "default", content, collapsed: initialC
 }
 
 // src/components/resource-tiles.jsx
-import React13, { useContext as useContext2 } from "react";
+import React14, { useContext as useContext2 } from "react";
 import { FileText as FileText2, Download, ExternalLink as ExternalLink2, Folder, File, Play } from "lucide-react";
 function useSafeConfig() {
   try {
@@ -965,7 +1021,7 @@ function ResourcePDF({ src, title, workspacePath }) {
       handleOpen();
     }
   };
-  return /* @__PURE__ */ React13.createElement("div", { className: "resource-pdf-container w-full my-3" }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center p-3 bg-muted/30 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer", onClick: handleOpen }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-3 flex-1" }, /* @__PURE__ */ React13.createElement("span", { className: "text-red-500 text-lg" }, "\u{1F4CB}"), /* @__PURE__ */ React13.createElement("span", { className: "font-medium text-foreground text-sm", title }, title)), /* @__PURE__ */ React13.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: "resource-pdf-container w-full my-3" }, /* @__PURE__ */ React14.createElement("div", { className: "flex items-center p-3 bg-muted/30 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer", onClick: handleOpen }, /* @__PURE__ */ React14.createElement("div", { className: "flex items-center gap-3 flex-1" }, /* @__PURE__ */ React14.createElement("span", { className: "text-red-500 text-lg" }, "\u{1F4CB}"), /* @__PURE__ */ React14.createElement("span", { className: "font-medium text-foreground text-sm", title }, title)), /* @__PURE__ */ React14.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React14.createElement(
     "button",
     {
       onClick: (e) => {
@@ -976,7 +1032,7 @@ function ResourcePDF({ src, title, workspacePath }) {
       title: "Open in new tab",
       "aria-label": "Open in new tab"
     },
-    /* @__PURE__ */ React13.createElement(ExternalLink2, { className: "w-4 h-4" })
+    /* @__PURE__ */ React14.createElement(ExternalLink2, { className: "w-4 h-4" })
   ))));
 }
 function ResourceHTML({ src, title, workspacePath }) {
@@ -1011,7 +1067,7 @@ function ResourceHTML({ src, title, workspacePath }) {
       handleOpen();
     }
   };
-  return /* @__PURE__ */ React13.createElement("div", { className: "resource-html-container w-full my-3" }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center p-3 bg-muted/30 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer", onClick: handleOpen }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-3 flex-1" }, /* @__PURE__ */ React13.createElement("span", { className: "text-blue-500 text-lg" }, "\u{1F310}"), /* @__PURE__ */ React13.createElement("span", { className: "font-medium text-foreground text-sm", title }, title)), /* @__PURE__ */ React13.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: "resource-html-container w-full my-3" }, /* @__PURE__ */ React14.createElement("div", { className: "flex items-center p-3 bg-muted/30 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer", onClick: handleOpen }, /* @__PURE__ */ React14.createElement("div", { className: "flex items-center gap-3 flex-1" }, /* @__PURE__ */ React14.createElement("span", { className: "text-blue-500 text-lg" }, "\u{1F310}"), /* @__PURE__ */ React14.createElement("span", { className: "font-medium text-foreground text-sm", title }, title)), /* @__PURE__ */ React14.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React14.createElement(
     "button",
     {
       onClick: (e) => {
@@ -1022,7 +1078,7 @@ function ResourceHTML({ src, title, workspacePath }) {
       title: "Open in new tab",
       "aria-label": "Open in new tab"
     },
-    /* @__PURE__ */ React13.createElement(ExternalLink2, { className: "w-4 h-4" })
+    /* @__PURE__ */ React14.createElement(ExternalLink2, { className: "w-4 h-4" })
   ))));
 }
 function getFileIcon(filename) {
@@ -1078,7 +1134,7 @@ function getFileIcon(filename) {
 }
 function ResourceYouTube({ videoId, title }) {
   const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-  return /* @__PURE__ */ React13.createElement("div", { className: "resource-youtube-container w-full my-6" }, /* @__PURE__ */ React13.createElement("div", { className: "aspect-video w-full" }, /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: "resource-youtube-container w-full my-6" }, /* @__PURE__ */ React14.createElement("div", { className: "aspect-video w-full" }, /* @__PURE__ */ React14.createElement(
     "iframe",
     {
       width: "100%",
@@ -1144,14 +1200,14 @@ Note: Folders cannot be opened directly in the browser. In the desktop app, this
       alert(`Unable to download file: ${displayName}`);
     }
   };
-  return /* @__PURE__ */ React13.createElement("div", { className: "resource-file-container w-full my-3" }, /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: "resource-file-container w-full my-3" }, /* @__PURE__ */ React14.createElement(
     "div",
     {
       className: "flex items-center p-3 bg-muted/30 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors",
       onClick: handleOpen
     },
-    /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-3 flex-1" }, /* @__PURE__ */ React13.createElement("span", { className: "text-lg" }, icon), /* @__PURE__ */ React13.createElement("span", { className: "font-medium text-foreground text-sm", title: displayName }, displayName)),
-    /* @__PURE__ */ React13.createElement("div", { className: "flex gap-2" }, type === "file" && /* @__PURE__ */ React13.createElement(
+    /* @__PURE__ */ React14.createElement("div", { className: "flex items-center gap-3 flex-1" }, /* @__PURE__ */ React14.createElement("span", { className: "text-lg" }, icon), /* @__PURE__ */ React14.createElement("span", { className: "font-medium text-foreground text-sm", title: displayName }, displayName)),
+    /* @__PURE__ */ React14.createElement("div", { className: "flex gap-2" }, type === "file" && /* @__PURE__ */ React14.createElement(
       "button",
       {
         onClick: (e) => {
@@ -1162,8 +1218,8 @@ Note: Folders cannot be opened directly in the browser. In the desktop app, this
         title: "Download file",
         "aria-label": "Download file"
       },
-      /* @__PURE__ */ React13.createElement(Download, { className: "w-4 h-4" })
-    ), /* @__PURE__ */ React13.createElement(
+      /* @__PURE__ */ React14.createElement(Download, { className: "w-4 h-4" })
+    ), /* @__PURE__ */ React14.createElement(
       "button",
       {
         onClick: (e) => {
@@ -1178,7 +1234,7 @@ Note: Folders cannot be opened directly in the browser. In the desktop app, this
         title: type === "folder" ? "Show folder info" : "Show file info",
         "aria-label": type === "folder" ? "Show folder info" : "Show file info"
       },
-      type === "folder" ? /* @__PURE__ */ React13.createElement(Folder, { className: "w-4 h-4" }) : /* @__PURE__ */ React13.createElement(File, { className: "w-4 h-4" })
+      type === "folder" ? /* @__PURE__ */ React14.createElement(Folder, { className: "w-4 h-4" }) : /* @__PURE__ */ React14.createElement(File, { className: "w-4 h-4" })
     ))
   ));
 }
@@ -1505,7 +1561,7 @@ var processTaskLists = (html) => {
   return tempDiv.innerHTML;
 };
 function TaskCheckbox({ checked, disabled = true }) {
-  return /* @__PURE__ */ React14.createElement(
+  return /* @__PURE__ */ React15.createElement(
     Checkbox,
     {
       checked,
@@ -1805,7 +1861,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
           container.className = "checkbox-container";
           placeholder.replaceWith(container);
           const root = createRoot(container);
-          root.render(/* @__PURE__ */ React14.createElement(TaskCheckbox, { checked: isChecked }));
+          root.render(/* @__PURE__ */ React15.createElement(TaskCheckbox, { checked: isChecked }));
           checkboxRootsRef.current.push(root);
         });
         const scratchspacePlaceholders = contentRef.current.querySelectorAll(".scratchspace-placeholder");
@@ -1819,7 +1875,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
             placeholder.replaceWith(container);
             const root = createRoot(container);
             root.render(
-              /* @__PURE__ */ React14.createElement(
+              /* @__PURE__ */ React15.createElement(
                 ScratchSpace,
                 {
                   title,
@@ -1839,7 +1895,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
           const container = document.createElement("div");
           placeholder.replaceWith(container);
           const root = createRoot(container);
-          root.render(/* @__PURE__ */ React14.createElement(ResourcePDF, { src, title, workspacePath: config.workspace.path }));
+          root.render(/* @__PURE__ */ React15.createElement(ResourcePDF, { src, title, workspacePath: config.workspace.path }));
           resourceRootsRef.current.push(root);
         });
         const htmlPlaceholders = contentRef.current.querySelectorAll(".resource-html-placeholder");
@@ -1849,7 +1905,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
           const container = document.createElement("div");
           placeholder.replaceWith(container);
           const root = createRoot(container);
-          root.render(/* @__PURE__ */ React14.createElement(ResourceHTML, { src, title, workspacePath: config.workspace.path }));
+          root.render(/* @__PURE__ */ React15.createElement(ResourceHTML, { src, title, workspacePath: config.workspace.path }));
           resourceRootsRef.current.push(root);
         });
         const filePlaceholders = contentRef.current.querySelectorAll(".resource-file-placeholder");
@@ -1860,7 +1916,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
           const container = document.createElement("div");
           placeholder.replaceWith(container);
           const root = createRoot(container);
-          root.render(/* @__PURE__ */ React14.createElement(ResourceFile, { path, name, type, workspacePath: config.workspace.path }));
+          root.render(/* @__PURE__ */ React15.createElement(ResourceFile, { path, name, type, workspacePath: config.workspace.path }));
           resourceRootsRef.current.push(root);
         });
         const youtubePlaceholders = contentRef.current.querySelectorAll(".resource-youtube-placeholder");
@@ -1870,7 +1926,7 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
           const container = document.createElement("div");
           placeholder.replaceWith(container);
           const root = createRoot(container);
-          root.render(/* @__PURE__ */ React14.createElement(ResourceYouTube, { videoId, title }));
+          root.render(/* @__PURE__ */ React15.createElement(ResourceYouTube, { videoId, title }));
           resourceRootsRef.current.push(root);
         });
       }
@@ -1916,22 +1972,22 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
     };
   }, [content, onFileSelect]);
   if (isLoading) {
-    return /* @__PURE__ */ React14.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ React14.createElement(Loader22, { className: "h-8 w-8 animate-spin text-muted-foreground" }));
+    return /* @__PURE__ */ React15.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ React15.createElement(Loader22, { className: "h-8 w-8 animate-spin text-muted-foreground" }));
   }
   if (error) {
-    return /* @__PURE__ */ React14.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ React14.createElement("p", { className: "text-muted-foreground" }, error));
+    return /* @__PURE__ */ React15.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ React15.createElement("p", { className: "text-muted-foreground" }, error));
   }
   if (!filePath) {
-    return /* @__PURE__ */ React14.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ React14.createElement("p", { className: "text-muted-foreground" }, "Select a document to view"));
+    return /* @__PURE__ */ React15.createElement("div", { className: "flex items-center justify-center h-full" }, /* @__PURE__ */ React15.createElement("p", { className: "text-muted-foreground" }, "Select a document to view"));
   }
-  return /* @__PURE__ */ React14.createElement("div", { className: "h-full overflow-auto" }, /* @__PURE__ */ React14.createElement("div", { className: "max-w-4xl mx-auto px-8 pt-4 pb-12" }, /* @__PURE__ */ React14.createElement("div", { className: "mb-8 px-8 py-8 bg-muted rounded-lg" }, /* @__PURE__ */ React14.createElement(Layers2, { className: "w-5 h-5 text-primary opacity-20 transition-opacity duration-200" }), /* @__PURE__ */ React14.createElement("h1", { className: "text-3xl md:text-4xl font-light mt-2" }, documentTitle), /* @__PURE__ */ React14.createElement("div", { className: "document-title-divider" })), /* @__PURE__ */ React14.createElement(
+  return /* @__PURE__ */ React15.createElement("div", { className: "h-full overflow-auto" }, /* @__PURE__ */ React15.createElement("div", { className: "max-w-4xl mx-auto px-8 pt-4 pb-12" }, /* @__PURE__ */ React15.createElement("div", { className: "mb-8 px-8 py-8 bg-muted rounded-lg" }, /* @__PURE__ */ React15.createElement(Layers2, { className: "w-5 h-5 text-primary opacity-20 transition-opacity duration-200" }), /* @__PURE__ */ React15.createElement("h1", { className: "text-3xl md:text-4xl font-light mt-2" }, documentTitle), /* @__PURE__ */ React15.createElement("div", { className: "document-title-divider" })), /* @__PURE__ */ React15.createElement(
     "div",
     {
       ref: contentRef,
       className: "markdown-content px-12",
       dangerouslySetInnerHTML: { __html: content }
     }
-  ), /* @__PURE__ */ React14.createElement(
+  ), /* @__PURE__ */ React15.createElement(
     DocumentFooter,
     {
       comments,
@@ -1946,6 +2002,104 @@ function MarkdownRenderer({ filePath, onFileSelect }) {
 }
 
 // src/components/wiki/Document.jsx
+import { Menu, List, ChevronRight as ChevronRight4 } from "lucide-react";
+
+// src/components/ui/sheet.jsx
+import * as React16 from "react";
+import * as SheetPrimitive from "@radix-ui/react-dialog";
+import { cva as cva2 } from "class-variance-authority";
+import { X } from "lucide-react";
+var Sheet = SheetPrimitive.Root;
+var SheetTrigger = SheetPrimitive.Trigger;
+var SheetClose = SheetPrimitive.Close;
+var SheetPortal = SheetPrimitive.Portal;
+var SheetOverlay = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Overlay,
+  {
+    className: cn(
+      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    ),
+    ...props,
+    ref
+  }
+));
+SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
+var sheetVariants = cva2(
+  "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+  {
+    variants: {
+      side: {
+        top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        bottom: "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+        right: "inset-y-0 right-0 h-full w-3/4  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm"
+      }
+    },
+    defaultVariants: {
+      side: "right"
+    }
+  }
+);
+var SheetContent = React16.forwardRef(({ side = "right", className, children, ...props }, ref) => /* @__PURE__ */ React16.createElement(SheetPortal, null, /* @__PURE__ */ React16.createElement(SheetOverlay, null), /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Content,
+  {
+    ref,
+    className: cn(sheetVariants({ side }), className),
+    ...props
+  },
+  children,
+  /* @__PURE__ */ React16.createElement(SheetPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary" }, /* @__PURE__ */ React16.createElement(X, { className: "h-4 w-4" }), /* @__PURE__ */ React16.createElement("span", { className: "sr-only" }, "Close"))
+)));
+SheetContent.displayName = SheetPrimitive.Content.displayName;
+var SheetHeader = ({
+  className,
+  ...props
+}) => /* @__PURE__ */ React16.createElement(
+  "div",
+  {
+    className: cn(
+      "flex flex-col space-y-2 text-center sm:text-left",
+      className
+    ),
+    ...props
+  }
+);
+SheetHeader.displayName = "SheetHeader";
+var SheetFooter = ({
+  className,
+  ...props
+}) => /* @__PURE__ */ React16.createElement(
+  "div",
+  {
+    className: cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      className
+    ),
+    ...props
+  }
+);
+SheetFooter.displayName = "SheetFooter";
+var SheetTitle = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Title,
+  {
+    ref,
+    className: cn("text-lg font-semibold text-foreground", className),
+    ...props
+  }
+));
+SheetTitle.displayName = SheetPrimitive.Title.displayName;
+var SheetDescription = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
+  SheetPrimitive.Description,
+  {
+    ref,
+    className: cn("text-sm text-muted-foreground", className),
+    ...props
+  }
+));
+SheetDescription.displayName = SheetPrimitive.Description.displayName;
+
+// src/components/wiki/Document.jsx
 var Document = ({
   initialFile = null,
   showNavigation = true,
@@ -1953,57 +2107,85 @@ var Document = ({
   navigationTitle = "All Pages",
   tocTitle = "On This Page",
   className = "",
-  onFileSelect: onFileSelectProp
+  onFileSelect: onFileSelectProp,
+  siteConfig = null,
+  serverDocument = null
 }) => {
+  var _a;
   const [selectedFile, setSelectedFile] = useState6(initialFile);
+  const [mobileNavOpen, setMobileNavOpen] = useState6(false);
+  const [mobileTocOpen, setMobileTocOpen] = useState6(false);
   useEffect4(() => {
     setSelectedFile(initialFile);
   }, [initialFile]);
   const handleFileSelect = (file) => {
     setSelectedFile(file);
     onFileSelectProp == null ? void 0 : onFileSelectProp(file);
+    setMobileNavOpen(false);
   };
-  const getGridColumns = () => {
-    if (showNavigation && showTableOfContents) return "grid-cols-5";
-    if (showNavigation || showTableOfContents) return "grid-cols-4";
-    return "grid-cols-1";
-  };
-  const getMainColumns = () => {
-    if (showNavigation && showTableOfContents) return "col-span-3";
-    if (showNavigation || showTableOfContents) return "col-span-3";
-    return "col-span-1";
-  };
-  return /* @__PURE__ */ React15.createElement("div", { className: `flex-1 overflow-hidden ${className}` }, /* @__PURE__ */ React15.createElement("div", { className: `h-full grid ${getGridColumns()} gap-0 max-w-8xl mx-auto` }, showNavigation && /* @__PURE__ */ React15.createElement("aside", { className: "col-span-1 border-r border-border border-dashed overflow-y-auto" }, /* @__PURE__ */ React15.createElement(
+  return /* @__PURE__ */ React17.createElement(React17.Fragment, null, /* @__PURE__ */ React17.createElement("div", { className: "md:hidden border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" }, /* @__PURE__ */ React17.createElement("div", { className: "flex items-center h-12 px-2" }, showNavigation && /* @__PURE__ */ React17.createElement(
+    Button,
+    {
+      variant: "ghost",
+      size: "icon",
+      className: "h-9 w-9",
+      onClick: () => setMobileNavOpen(true)
+    },
+    /* @__PURE__ */ React17.createElement(Menu, { className: "h-5 w-5" })
+  ), /* @__PURE__ */ React17.createElement("div", { className: "flex-1 flex items-center px-2 text-sm text-muted-foreground overflow-hidden" }, /* @__PURE__ */ React17.createElement("span", { className: "truncate" }, selectedFile ? /* @__PURE__ */ React17.createElement(React17.Fragment, null, /* @__PURE__ */ React17.createElement("span", null, "Documents"), /* @__PURE__ */ React17.createElement(ChevronRight4, { className: "h-3 w-3 inline mx-1" }), /* @__PURE__ */ React17.createElement("span", { className: "text-foreground" }, (_a = selectedFile.split("/").pop()) == null ? void 0 : _a.replace(".md", ""))) : "Select a document")), showTableOfContents && /* @__PURE__ */ React17.createElement(
+    Button,
+    {
+      variant: "ghost",
+      size: "icon",
+      className: "h-9 w-9 lg:hidden",
+      onClick: () => setMobileTocOpen(true)
+    },
+    /* @__PURE__ */ React17.createElement(List, { className: "h-5 w-5" })
+  ))), /* @__PURE__ */ React17.createElement("div", { className: `flex-1 overflow-hidden ${className}` }, /* @__PURE__ */ React17.createElement("div", { className: "h-full flex max-w-8xl mx-auto" }, showNavigation && /* @__PURE__ */ React17.createElement("aside", { className: "hidden md:block w-64 border-r border-border border-dashed overflow-y-auto flex-shrink-0" }, /* @__PURE__ */ React17.createElement(
     NavigationSidebar,
     {
       showTitle: true,
       title: navigationTitle,
       onFileSelect: handleFileSelect,
-      selectedFile
+      selectedFile,
+      siteConfig
     }
-  )), /* @__PURE__ */ React15.createElement("main", { className: `bg-background overflow-y-auto ${getMainColumns()}` }, /* @__PURE__ */ React15.createElement(ScrollArea, { className: "h-full" }, /* @__PURE__ */ React15.createElement(
+  )), /* @__PURE__ */ React17.createElement("main", { className: "flex-1 bg-background overflow-y-auto" }, /* @__PURE__ */ React17.createElement(
     MarkdownRenderer,
     {
       filePath: selectedFile,
       onFileSelect: handleFileSelect
     }
-  ))), showTableOfContents && /* @__PURE__ */ React15.createElement("aside", { className: "col-span-1 overflow-y-auto" }, /* @__PURE__ */ React15.createElement(
+  )), showTableOfContents && /* @__PURE__ */ React17.createElement("aside", { className: "hidden lg:block w-64 overflow-y-auto flex-shrink-0" }, /* @__PURE__ */ React17.createElement(
     TableOfContents,
     {
       showTitle: true,
       title: tocTitle
     }
-  ))));
+  )))), showNavigation && /* @__PURE__ */ React17.createElement(Sheet, { open: mobileNavOpen, onOpenChange: setMobileNavOpen }, /* @__PURE__ */ React17.createElement(SheetContent, { side: "left", className: "w-80 p-0 flex flex-col h-full" }, /* @__PURE__ */ React17.createElement(SheetHeader, { className: "px-6 py-4 border-b" }, /* @__PURE__ */ React17.createElement(SheetTitle, null, "All Pages")), /* @__PURE__ */ React17.createElement("div", { className: "flex-1 overflow-hidden" }, /* @__PURE__ */ React17.createElement("div", { className: "h-full overflow-y-auto" }, /* @__PURE__ */ React17.createElement(
+    NavigationSidebar,
+    {
+      showTitle: false,
+      onFileSelect: handleFileSelect,
+      selectedFile,
+      siteConfig
+    }
+  ))))), showTableOfContents && /* @__PURE__ */ React17.createElement(Sheet, { open: mobileTocOpen, onOpenChange: setMobileTocOpen }, /* @__PURE__ */ React17.createElement(SheetContent, { side: "right", className: "w-80 p-0 flex flex-col h-full" }, /* @__PURE__ */ React17.createElement(SheetHeader, { className: "px-6 py-4 border-b" }, /* @__PURE__ */ React17.createElement(SheetTitle, null, "On This Page")), /* @__PURE__ */ React17.createElement("div", { className: "flex-1 overflow-hidden" }, /* @__PURE__ */ React17.createElement("div", { className: "h-full overflow-y-auto" }, /* @__PURE__ */ React17.createElement(
+    TableOfContents,
+    {
+      showTitle: false
+    }
+  ))))));
 };
 
 // src/components/wiki/TableOfContents.jsx
-import React16 from "react";
+import React18 from "react";
 var TableOfContents2 = ({
   showTitle = true,
   title = "On This Page",
   className = ""
 }) => {
-  return /* @__PURE__ */ React16.createElement("div", { className }, /* @__PURE__ */ React16.createElement(
+  return /* @__PURE__ */ React18.createElement("div", { className }, /* @__PURE__ */ React18.createElement(
     TableOfContents,
     {
       showTitle,
@@ -2013,44 +2195,44 @@ var TableOfContents2 = ({
 };
 
 // src/components/theme-provider.jsx
-import * as React17 from "react";
+import * as React19 from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 function ThemeProvider({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ React17.createElement(NextThemesProvider, { ...props }, children);
+  return /* @__PURE__ */ React19.createElement(NextThemesProvider, { ...props }, children);
 }
 
 // src/components/ui/dialog.jsx
-import * as React18 from "react";
+import * as React20 from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 function Dialog({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Root, { "data-slot": "dialog", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Root, { "data-slot": "dialog", ...props });
 }
 function DialogTrigger({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Trigger, { "data-slot": "dialog-trigger", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Trigger, { "data-slot": "dialog-trigger", ...props });
 }
 function DialogPortal({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Portal, { "data-slot": "dialog-portal", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Portal, { "data-slot": "dialog-portal", ...props });
 }
 function DialogClose({
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPrimitive.Close, { "data-slot": "dialog-close", ...props });
+  return /* @__PURE__ */ React20.createElement(DialogPrimitive.Close, { "data-slot": "dialog-close", ...props });
 }
 function DialogOverlay({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Overlay,
     {
       "data-slot": "dialog-overlay",
@@ -2068,7 +2250,7 @@ function DialogContent({
   showCloseButton = true,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(DialogPortal, { "data-slot": "dialog-portal" }, /* @__PURE__ */ React18.createElement(DialogOverlay, null), /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(DialogPortal, { "data-slot": "dialog-portal" }, /* @__PURE__ */ React20.createElement(DialogOverlay, null), /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Content,
     {
       "data-slot": "dialog-content",
@@ -2079,19 +2261,19 @@ function DialogContent({
       ...props
     },
     children,
-    showCloseButton && /* @__PURE__ */ React18.createElement(
+    showCloseButton && /* @__PURE__ */ React20.createElement(
       DialogPrimitive.Close,
       {
         "data-slot": "dialog-close",
         className: "ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
       },
-      /* @__PURE__ */ React18.createElement(XIcon, null),
-      /* @__PURE__ */ React18.createElement("span", { className: "sr-only" }, "Close")
+      /* @__PURE__ */ React20.createElement(XIcon, null),
+      /* @__PURE__ */ React20.createElement("span", { className: "sr-only" }, "Close")
     )
   ));
 }
 function DialogHeader({ className, ...props }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     "div",
     {
       "data-slot": "dialog-header",
@@ -2101,7 +2283,7 @@ function DialogHeader({ className, ...props }) {
   );
 }
 function DialogFooter({ className, ...props }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     "div",
     {
       "data-slot": "dialog-footer",
@@ -2117,7 +2299,7 @@ function DialogTitle({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Title,
     {
       "data-slot": "dialog-title",
@@ -2130,7 +2312,7 @@ function DialogDescription({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React20.createElement(
     DialogPrimitive.Description,
     {
       "data-slot": "dialog-description",
@@ -2141,23 +2323,23 @@ function DialogDescription({
 }
 
 // src/components/ui/dropdown-menu.jsx
-import * as React19 from "react";
+import * as React21 from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { CheckIcon as CheckIcon2, ChevronRightIcon, CircleIcon } from "lucide-react";
 function DropdownMenu({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Root, { "data-slot": "dropdown-menu", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Root, { "data-slot": "dropdown-menu", ...props });
 }
 function DropdownMenuPortal({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Portal, { "data-slot": "dropdown-menu-portal", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Portal, { "data-slot": "dropdown-menu-portal", ...props });
 }
 function DropdownMenuTrigger({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Trigger,
     {
       "data-slot": "dropdown-menu-trigger",
@@ -2170,7 +2352,7 @@ function DropdownMenuContent({
   sideOffset = 4,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Portal, null, /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Portal, null, /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Content,
     {
       "data-slot": "dropdown-menu-content",
@@ -2186,7 +2368,7 @@ function DropdownMenuContent({
 function DropdownMenuGroup({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Group, { "data-slot": "dropdown-menu-group", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Group, { "data-slot": "dropdown-menu-group", ...props });
 }
 function DropdownMenuItem({
   className,
@@ -2194,7 +2376,7 @@ function DropdownMenuItem({
   variant = "default",
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Item,
     {
       "data-slot": "dropdown-menu-item",
@@ -2214,7 +2396,7 @@ function DropdownMenuCheckboxItem({
   checked,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.CheckboxItem,
     {
       "data-slot": "dropdown-menu-checkbox-item",
@@ -2225,14 +2407,14 @@ function DropdownMenuCheckboxItem({
       checked,
       ...props
     },
-    /* @__PURE__ */ React19.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React19.createElement(CheckIcon2, { className: "size-4" }))),
+    /* @__PURE__ */ React21.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React21.createElement(CheckIcon2, { className: "size-4" }))),
     children
   );
 }
 function DropdownMenuRadioGroup({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.RadioGroup,
     {
       "data-slot": "dropdown-menu-radio-group",
@@ -2245,7 +2427,7 @@ function DropdownMenuRadioItem({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.RadioItem,
     {
       "data-slot": "dropdown-menu-radio-item",
@@ -2255,7 +2437,7 @@ function DropdownMenuRadioItem({
       ),
       ...props
     },
-    /* @__PURE__ */ React19.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React19.createElement(CircleIcon, { className: "size-2 fill-current" }))),
+    /* @__PURE__ */ React21.createElement("span", { className: "pointer-events-none absolute left-2 flex size-3.5 items-center justify-center" }, /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.ItemIndicator, null, /* @__PURE__ */ React21.createElement(CircleIcon, { className: "size-2 fill-current" }))),
     children
   );
 }
@@ -2264,7 +2446,7 @@ function DropdownMenuLabel({
   inset,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Label,
     {
       "data-slot": "dropdown-menu-label",
@@ -2281,7 +2463,7 @@ function DropdownMenuSeparator({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.Separator,
     {
       "data-slot": "dropdown-menu-separator",
@@ -2294,7 +2476,7 @@ function DropdownMenuShortcut({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     "span",
     {
       "data-slot": "dropdown-menu-shortcut",
@@ -2309,7 +2491,7 @@ function DropdownMenuShortcut({
 function DropdownMenuSub({
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(DropdownMenuPrimitive.Sub, { "data-slot": "dropdown-menu-sub", ...props });
+  return /* @__PURE__ */ React21.createElement(DropdownMenuPrimitive.Sub, { "data-slot": "dropdown-menu-sub", ...props });
 }
 function DropdownMenuSubTrigger({
   className,
@@ -2317,7 +2499,7 @@ function DropdownMenuSubTrigger({
   children,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.SubTrigger,
     {
       "data-slot": "dropdown-menu-sub-trigger",
@@ -2329,14 +2511,14 @@ function DropdownMenuSubTrigger({
       ...props
     },
     children,
-    /* @__PURE__ */ React19.createElement(ChevronRightIcon, { className: "ml-auto size-4" })
+    /* @__PURE__ */ React21.createElement(ChevronRightIcon, { className: "ml-auto size-4" })
   );
 }
 function DropdownMenuSubContent({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React19.createElement(
+  return /* @__PURE__ */ React21.createElement(
     DropdownMenuPrimitive.SubContent,
     {
       "data-slot": "dropdown-menu-sub-content",
@@ -2350,9 +2532,9 @@ function DropdownMenuSubContent({
 }
 
 // src/components/ui/input.jsx
-import * as React20 from "react";
+import * as React22 from "react";
 function Input({ className, type, ...props }) {
-  return /* @__PURE__ */ React20.createElement(
+  return /* @__PURE__ */ React22.createElement(
     "input",
     {
       type,
@@ -2369,7 +2551,7 @@ function Input({ className, type, ...props }) {
 }
 
 // src/components/ui/separator.jsx
-import * as React21 from "react";
+import * as React23 from "react";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 function Separator2({
   className,
@@ -2377,7 +2559,7 @@ function Separator2({
   decorative = true,
   ...props
 }) {
-  return /* @__PURE__ */ React21.createElement(
+  return /* @__PURE__ */ React23.createElement(
     SeparatorPrimitive.Root,
     {
       "data-slot": "separator",
@@ -2393,13 +2575,13 @@ function Separator2({
 }
 
 // src/components/ui/tabs.jsx
-import * as React22 from "react";
+import * as React24 from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 function Tabs({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.Root,
     {
       "data-slot": "tabs",
@@ -2412,7 +2594,7 @@ function TabsList({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.List,
     {
       "data-slot": "tabs-list",
@@ -2428,7 +2610,7 @@ function TabsTrigger({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.Trigger,
     {
       "data-slot": "tabs-trigger",
@@ -2444,7 +2626,7 @@ function TabsContent({
   className,
   ...props
 }) {
-  return /* @__PURE__ */ React22.createElement(
+  return /* @__PURE__ */ React24.createElement(
     TabsPrimitive.Content,
     {
       "data-slot": "tabs-content",
@@ -2482,6 +2664,10 @@ var defaultConfig = {
   }
 };
 export {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Button,
   Checkbox,
   ConfigProvider,
@@ -2518,14 +2704,31 @@ export {
   ScrollArea,
   ScrollBar,
   Separator2 as Separator,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
   TableOfContents2 as TableOfContents,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
   ThemeProvider,
+  buildFileTree,
   buttonVariants,
+  createSlugMap,
   defaultConfig,
+  fetchWorkspaceRegistry,
+  getWorkspaceFileTree,
+  initializeSlugMapping,
+  pathToSlug,
+  slugToPath,
   useConfig
 };
 //# sourceMappingURL=index.mjs.map

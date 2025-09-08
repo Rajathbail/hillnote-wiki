@@ -8,8 +8,8 @@
 4. **Use the context below** to understand my current priorities when helping
 ---
 
-**Purpose:** A quick workspace to demonstrate the wiki conversion of the Hillnote-wiki NPM
-**Documents:** 5 files | **Last Updated:** 2025-09-03
+**Purpose:** A workspace that describes Hillnote for users new to the platform! The best place to learn more about the platform and its many features.
+**Documents:** 16 files | **Last Updated:** 2025-09-08
 
 ## Directory Structure
 - **documents/**: All your markdown documents and notes

@@ -14,6 +14,7 @@ export { ThemeProvider } from './components/theme-provider'
 export { ConfigProvider, useConfig } from './components/ConfigProvider'
 
 // UI Components
+export * from './components/ui/accordion'
 export * from './components/ui/button'
 export * from './components/ui/checkbox'
 export * from './components/ui/dialog'
@@ -21,7 +22,15 @@ export * from './components/ui/dropdown-menu'
 export * from './components/ui/input'
 export * from './components/ui/scroll-area'
 export * from './components/ui/separator'
+export * from './components/ui/sheet'
 export * from './components/ui/tabs'
 
 // Configuration
 export { defaultConfig } from './config/hillnote-wiki.config'
+
+// Route Handlers (for Next.js App Router)
+// These are exported separately to avoid bundling issues
+
+// Utility Functions (client-safe only)
+export { pathToSlug, slugToPath, createSlugMap, initializeSlugMapping } from './lib/slug-utils'
+export { buildFileTree, fetchWorkspaceRegistry, getWorkspaceFileTree } from './lib/workspace'

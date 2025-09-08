@@ -4,18 +4,107 @@ import React, { useState, useEffect } from 'react'
 import { 
   ChevronDown, 
   ChevronRight,
-  Loader2
+  Loader2,
+  BookOpen,
+  Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/ui/button"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { getWorkspaceFileTree } from '@/lib/workspace'
 import { siteConfig } from '@/config/site.config'
 
-const TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+// Check if a folder contains the active file
+const folderContainsActiveFile = (node, currentFile) => {
+  if (!node.children || !currentFile) return false
+  
+  return node.children.some(child => {
+    if (child.id === currentFile) return true
+    if (child.children) return folderContainsActiveFile(child, currentFile)
+    return false
+  })
+}
+
+// Wiki mode accordion component
+const WikiTreeNode = ({ node, currentFile, onFileSelect, parentPath = '' }) => {
+  const isActive = currentFile === node.id
+  const hasChildren = node.children && node.children.length > 0
+  const accordionValue = parentPath ? `${parentPath}-${node.id}` : node.id
+  const shouldBeOpen = folderContainsActiveFile(node, currentFile)
+
+  if (node.type === 'file') {
+    return (
+      <button
+        className={cn(
+          "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors w-full text-left",
+          isActive ? "bg-accent font-semibold" : "hover:bg-accent/50"
+        )}
+        onClick={() => onFileSelect(node.id)}
+      >
+        <span className="break-words">
+          {node.name.endsWith('.md') ? node.name.replace(/\.md$/, '') : node.name}
+        </span>
+      </button>
+    )
+  }
+
+  if (!hasChildren) {
+    return (
+      <div className="px-3 py-1.5 text-sm text-muted-foreground">
+        {node.name}
+      </div>
+    )
+  }
+
+  return (
+    <Accordion 
+      type="single" 
+      collapsible 
+      className="w-full"
+      defaultValue={shouldBeOpen ? accordionValue : undefined}
+    >
+      <AccordionItem value={accordionValue} className="border-b-0">
+        <AccordionTrigger className="px-3 py-2 text-sm hover:no-underline hover:bg-accent/50 rounded-md">
+          {node.name}
+        </AccordionTrigger>
+        <AccordionContent className="pl-3">
+          <div className="flex flex-col space-y-1">
+            {node.children?.map((child) => (
+              <WikiTreeNode
+                key={child.id}
+                node={child}
+                currentFile={currentFile}
+                onFileSelect={onFileSelect}
+                parentPath={accordionValue}
+              />
+            ))}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  )
+}
+
+// Emoji mode tree component
+const TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect, mode = 'emoji' }) => {
+  const shouldBeOpen = folderContainsActiveFile(node, currentFile)
+  const [isExpanded, setIsExpanded] = useState(shouldBeOpen)
 
   const isActive = currentFile === node.id
   const hasChildren = node.children && node.children.length > 0
+  
+  // Update expansion state when currentFile changes
+  useEffect(() => {
+    if (shouldBeOpen) {
+      setIsExpanded(true)
+    }
+  }, [shouldBeOpen, currentFile])
 
   const handleClick = () => {
     if (node.type === 'file') {
@@ -36,16 +125,26 @@ const TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
           onClick={handleClick}
           style={{ paddingLeft: `${level * 8 + 8}px` }}
         >
-          {node.type === 'directory' && (
+          {mode === 'emoji' && (
+            <>
+              {node.type === 'directory' && (
+                <span className="transition-transform">
+                  {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                </span>
+              )}
+              
+              {node.type === 'directory' ? (
+                isExpanded ? <span className='text-md'>📁</span> : <span className='text-md'>📂</span>
+              ) : (
+                <span className="text-xs ml-5 shrink-0">{node.emoji || '🌵'}</span>
+              )}
+            </>
+          )}
+          
+          {mode === 'wiki' && node.type === 'directory' && (
             <span className="transition-transform">
               {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
             </span>
-          )}
-          
-          {node.type === 'directory' ? (
-            isExpanded ? <span className='text-md'>📁</span> : <span className='text-md'>📂</span>
-          ) : (
-            <span className="text-xs ml-5 shrink-0">{node.emoji || '🌵'}</span>
           )}
           
           <span className="truncate">
@@ -63,6 +162,7 @@ const TreeNodeComponent = ({ node, level = 0, currentFile, onFileSelect }) => {
               level={level + 1}
               currentFile={currentFile}
               onFileSelect={onFileSelect}
+              mode={mode}
             />
           ))}
         </div>
@@ -81,6 +181,7 @@ export function NavigationSidebar({
   const [fileTree, setFileTree] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [navigationMode, setNavigationMode] = useState(siteConfig.ui?.navigationMode || 'emoji')
 
   // Update currentFile when selectedFile prop changes
   useEffect(() => {
@@ -138,14 +239,14 @@ export function NavigationSidebar({
   }, [])
 
   return (
-    <div className="h-full p-3">
-      <div className="h-full flex flex-col overflow-hidden">
-        {showTitle && (
-          <div className="px-3 pt-6">
-            <h3 className="text-xs text-primary/40 font-semibold">{title}</h3>
-          </div>
-        )}
-        <ScrollArea className="mt-4 flex-1 px-2 py-2">
+    <div className="h-full flex flex-col p-3">
+      {showTitle && (
+        <div className="px-3 pt-6 pb-4">
+          <h3 className="text-xs text-primary/40 font-semibold">{title}</h3>
+        </div>
+      )}
+      <div className="flex-1 min-h-0">
+        <ScrollArea className="h-full px-2 py-2">
           <div className="flex flex-col space-y-1">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -160,20 +261,37 @@ export function NavigationSidebar({
                 No documents found
               </div>
             ) : (
-              fileTree.map((node) => (
-                <TreeNodeComponent
-                  key={node.id}
-                  node={node}
-                  level={0}
-                  currentFile={currentFile}
-                  onFileSelect={(id) => {
-                    setCurrentFile(id)
-                    if (onFileSelect) {
-                      onFileSelect(id)
-                    }
-                  }}
-                />
-              ))
+              navigationMode === 'wiki' ? (
+                fileTree.map((node) => (
+                  <WikiTreeNode
+                    key={node.id}
+                    node={node}
+                    currentFile={currentFile}
+                    onFileSelect={(id) => {
+                      setCurrentFile(id)
+                      if (onFileSelect) {
+                        onFileSelect(id)
+                      }
+                    }}
+                  />
+                ))
+              ) : (
+                fileTree.map((node) => (
+                  <TreeNodeComponent
+                    key={node.id}
+                    node={node}
+                    level={0}
+                    currentFile={currentFile}
+                    onFileSelect={(id) => {
+                      setCurrentFile(id)
+                      if (onFileSelect) {
+                        onFileSelect(id)
+                      }
+                    }}
+                    mode={navigationMode}
+                  />
+                ))
+              )
             )}
           </div>
         </ScrollArea>

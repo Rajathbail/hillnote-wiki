@@ -1,0 +1,37 @@
+# Hillnote Wiki Documentation
+# AI-friendly structured data endpoint: http://localhost:3000/api/ai-sitemap
+# This endpoint provides JSON with document descriptions and relationships
+
+User-Agent: *
+Allow: /
+Allow: /api/ai-sitemap
+Disallow: /api/
+
+User-Agent: GPTBot
+Allow: /
+Allow: /api/ai-sitemap
+
+User-Agent: ChatGPT-User
+Allow: /
+Allow: /api/ai-sitemap
+
+User-Agent: CCBot
+Allow: /
+Allow: /api/ai-sitemap
+
+User-Agent: Googlebot
+Allow: /
+
+User-Agent: Bingbot
+Allow: /
+
+# Site information
+Host: localhost:3000
+Sitemap: http://localhost:3000/sitemap.xml
+
+# For AI assistants: Access /api/ai-sitemap for structured document data
+# This endpoint provides:
+# - Document titles and descriptions
+# - Document relationships and references
+# - Navigation structure
+# - Last modified dates

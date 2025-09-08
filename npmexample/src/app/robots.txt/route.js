@@ -1,0 +1,1 @@
+export { robotsRoute as GET } from '@hillnote/wiki/routes'

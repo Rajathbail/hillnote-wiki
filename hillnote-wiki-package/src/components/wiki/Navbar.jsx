@@ -9,7 +9,7 @@ export const Navbar = ({
   children
 }) => {
   return (
-    <header className={`h-16 bg-background flex items-center justify-between px-8 pt-8 pb-4 ${className}`}>
+    <header className={`h-16 bg-background flex items-center justify-between px-4 md:px-8 pt-8 pb-4 ${className}`}>
       {showSiteName && (
         <div className="flex items-center gap-2">
           <span className="font-semibold text-lg">{siteName}</span>

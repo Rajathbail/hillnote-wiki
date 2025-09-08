@@ -1,5 +1,5 @@
 export default {
-  entry: ['src/index.js'],
+  entry: ['src/index.js', 'src/routes.js'],
   format: ['cjs', 'esm'],
   dts: false, // No TypeScript declarations needed
   sourcemap: true,

@@ -1,0 +1,1 @@
+export { sitemapRoute as default } from '@hillnote/wiki/routes'
