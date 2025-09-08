@@ -1,58 +1,67 @@
 "use client"
 
-import { Document, Navbar, ConfigProvider, pathToSlug, initializeSlugMapping } from '@hillnote/wiki'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
-const wikiConfig = {
-  siteName: "Hillnote Wiki",
-  workspace: {
-    path: "/Welcome to Hillnote! /",
-    enabled: true,
-    documentsFolder: "documents",
-    registryFile: "documents-registry.json",
-    initialFile: "documents/Start Here .md"
-  },
-  ui: {
-    authorsNotes: true,
-    navigationText: "All Pages",
-    navigationMode: "wiki" // Options: "emoji" or "wiki"
-  }
-}
-
-export default function WikiPage() {
-  const [mounted, setMounted] = useState(false)
-  const router = useRouter()
-
-  useEffect(() => {
-    setMounted(true)
-    // Initialize slug mapping on mount
-    initializeSlugMapping(wikiConfig)
-  }, [])
-
-  const handleFileSelect = (filePath) => {
-    if (!filePath) return
-    
-    // Convert file path to URL slug
-    const slug = pathToSlug(filePath)
-    
-    router.push(`/doc/${slug}`)
-  }
-
-  if (!mounted) return null
-
+export default function HomePage() {
   return (
-    <ConfigProvider config={wikiConfig}>
-      <div className="h-screen flex flex-col">
-        <Navbar siteName={wikiConfig.siteName} showThemeToggle={true} />
-        <Document 
-          siteConfig={wikiConfig}
-          initialFile={wikiConfig.workspace.initialFile}
-          showNavigation={true}
-          showTableOfContents={true}
-          onFileSelect={handleFileSelect}
-        />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-2xl mx-auto px-6 py-24">
+        <div className="text-center mb-16">
+          <h1 className="text-3xl font-light text-gray-900 mb-3">
+            Hillnote Wiki
+          </h1>
+          <p className="text-gray-500">
+            Simple documentation system
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <Link 
+            href="/doc" 
+            className="block bg-white rounded-lg px-6 py-4 hover:shadow-sm transition-shadow border border-gray-100"
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium text-gray-900">Documentation</h3>
+                <p className="text-sm text-gray-500 mt-1">Browse wiki pages</p>
+              </div>
+              <span className="text-gray-400">→</span>
+            </div>
+          </Link>
+
+          <Link 
+            href="/api/ai-sitemap" 
+            className="block bg-white rounded-lg px-6 py-4 hover:shadow-sm transition-shadow border border-gray-100"
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium text-gray-900">AI API</h3>
+                <p className="text-sm text-gray-500 mt-1">Structured data endpoint</p>
+              </div>
+              <span className="text-gray-400">→</span>
+            </div>
+          </Link>
+
+          <Link 
+            href="/sitemap.xml" 
+            className="block bg-white rounded-lg px-6 py-4 hover:shadow-sm transition-shadow border border-gray-100"
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium text-gray-900">Sitemap</h3>
+                <p className="text-sm text-gray-500 mt-1">XML for search engines</p>
+              </div>
+              <span className="text-gray-400">→</span>
+            </div>
+          </Link>
+        </div>
+
+        <div className="mt-16 text-center">
+          <p className="text-xs text-gray-400">
+            Powered by @hillnote/wiki
+          </p>
+        </div>
       </div>
-    </ConfigProvider>
+    </div>
   )
 }
